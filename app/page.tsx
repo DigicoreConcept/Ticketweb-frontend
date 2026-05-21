@@ -34,92 +34,183 @@ export default function Home() {
     <main className="min-h-screen bg-[#0A0A0A]">
       <HeroSection />
 
-      {/* Trending Section */}
+      {/* ── Trending Section ── */}
       <section className="py-20 relative z-10">
-        <div className="sm:flex justify-between items-end mb-10 px-6 md:px-12 lg:px-20">
+        <div className="flex justify-between items-end mb-10 px-6 md:px-12 lg:px-20">
           <div>
-            <h2 className="text-3xl font-bold text-white mb-2">
+            <p className="text-primary text-xs font-black uppercase tracking-[0.2em] mb-2">
+              What's Hot
+            </p>
+            <h2 className="text-3xl font-black text-white tracking-tight">
               Trending Events
             </h2>
-            <p className="text-neutral-400">
+            <p className="text-neutral-500 mt-1 text-sm">
               Don't miss out on what everyone's talking about.
             </p>
           </div>
-          <button className="text-primary hover:text-white transition-colors flex items-center gap-2 font-medium">
-            View All <ArrowRight className="w-4 h-4" />
-          </button>
+          <a
+            href="/events"
+            className="hidden sm:inline-flex items-center gap-2 text-sm font-bold text-neutral-400 hover:text-white transition-colors group"
+          >
+            View All
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </a>
         </div>
 
         {loading ? (
-          <div className="text-white">Loading events...</div>
+          /* Skeleton row */
+          <div className="flex gap-4 px-6 md:px-12 lg:px-20 overflow-hidden">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div
+                key={i}
+                className="shrink-0 w-52 rounded-2xl bg-white/[0.04] animate-pulse"
+                style={{ aspectRatio: "3/4" }}
+              />
+            ))}
+          </div>
+        ) : events.length === 0 ? (
+          <p className="text-neutral-600 text-center text-sm">No events yet.</p>
         ) : (
-          <>
-            <div className="relative">
-              {events.length === 0 ? (
-                <p className="text-neutral-500 text-center">No events found.</p>
-              ) : (
-                <div className="mt-8">
-                  <Swiper
-                    spaceBetween={16}
-                    slidesPerView={"auto"}
-                    className="w-full h-[520px] pt-8! px-6 md:px-12 lg:px-20"
-                  >
-                    {events.slice(0, 10).map((event) => (
-                      <SwiperSlide key={event.id} className="!w-70 h-auto">
-                        <EventCard
-                          slug={event.slug}
-                          title={event.title}
-                          date={new Date(event.start_time).toLocaleDateString()}
-                          image={
-                            event.image_url ||
-                            "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=800&q=80"
-                          }
-                          price="From ₦20"
-                          location={event.location || "TBA"}
-                          category="Music"
-                          isTrending={true}
-                        />
-                      </SwiperSlide>
-                    ))}
-
-                    {/* See More Slide */}
-                    {events.length > 10 && (
-                      <SwiperSlide className="w-55!">
-                        <a
-                          href="/events"
-                          className="flex h-full pl-4 items-center justify-start rounded-2xl bg-black transition"
-                        >
-                          <div className="flex items-center rounded-full bg-primary p-4 gap-2 text-white font-medium hover:animate-shimmer">
-                            <ChevronRight className="w-4 h-4" />
-                          </div>
-                        </a>
-                      </SwiperSlide>
+          <div className="relative">
+            <Swiper
+              spaceBetween={14}
+              slidesPerView="auto"
+              className="!px-6 md:!px-12 lg:!px-20 !pb-4"
+            >
+              {events.slice(0, 12).map((event) => (
+                <SwiperSlide key={event.id} className="!w-52">
+                  <EventCard
+                    slug={event.slug}
+                    title={event.title}
+                    date={new Date(event.start_time).toLocaleDateString(
+                      undefined,
+                      {
+                        weekday: "short",
+                        month: "short",
+                        day: "numeric",
+                      },
                     )}
-                  </Swiper>
+                    image={
+                      event.banner_image_url ||
+                      event.image_url ||
+                      "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=800&q=80"
+                    }
+                    price={
+                      event.ticket_tiers && event.ticket_tiers.length > 0
+                        ? `From ₦${Math.min(
+                            ...event.ticket_tiers.map((t) => t.base_price),
+                          ).toLocaleString()}`
+                        : "Free"
+                    }
+                    location={event.location || "TBA"}
+                    category="Music"
+                    isTrending
+                  />
+                </SwiperSlide>
+              ))}
 
-                  <div className="pointer-events-none absolute top-0 left-0 h-full w-40 z-20 bg-gradient-to-r from-black via-black/70 to-transparent" />
-                  <div className="pointer-events-none absolute top-0 right-0 h-full w-40 z-20 bg-gradient-to-l from-black via-black/70 to-transparent" />
-                </div>
+              {events.length > 12 && (
+                <SwiperSlide className="!w-16 !self-stretch">
+                  <a
+                    href="/events"
+                    className="flex h-full items-center justify-center"
+                  >
+                    <span className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center hover:bg-primary hover:border-primary transition-all">
+                      <ChevronRight className="w-4 h-4 text-primary hover:text-white" />
+                    </span>
+                  </a>
+                </SwiperSlide>
               )}
-            </div>
-          </>
+            </Swiper>
+
+            {/* Edge fades */}
+            <div className="pointer-events-none absolute top-0 left-0 h-full w-16 z-10 bg-gradient-to-r from-[#0A0A0A] to-transparent" />
+            <div className="pointer-events-none absolute top-0 right-0 h-full w-16 z-10 bg-gradient-to-l from-[#0A0A0A] to-transparent" />
+          </div>
         )}
+
+        {/* Mobile view all */}
+        <div className="sm:hidden mt-6 text-center">
+          <a
+            href="/events"
+            className="inline-flex items-center gap-2 text-sm font-bold text-neutral-400 hover:text-white transition-colors"
+          >
+            View All Events <ArrowRight className="w-4 h-4" />
+          </a>
+        </div>
       </section>
 
-      {/* Featured Banner (Placeholder) */}
+      {/* ── Host Your Event CTA ── */}
       <section className="py-10 px-6 md:px-12 lg:px-20">
-        <div className="rounded-3xl bg-primary/10 border border-white/5 p-12 text-center relative overflow-hidden group">
-          <div className="relative z-10">
-            <h2 className="text-4xl font-bold text-white mb-4">
-              Host Your Own Event
-            </h2>
-            <p className="text-neutral-300 max-w-xl mx-auto mb-8">
-              Create, sell, and manage tickets seamlessly. Join thousands of
-              creators using our platform.
-            </p>
-            <button className="bg-white text-black px-8 py-3 rounded-full font-bold hover:bg-neutral-200 transition-colors">
-              Get Started
-            </button>
+        <div className="rounded-3xl border border-white/5 overflow-hidden relative">
+          {/* Background grid + glow */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff06_1px,transparent_1px),linear-gradient(to_bottom,#ffffff06_1px,transparent_1px)] bg-[size:40px_40px]" />
+          <div className="absolute -top-32 -left-32 w-96 h-96 bg-primary/20 rounded-full blur-[100px]" />
+          <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-primary/10 rounded-full blur-[100px]" />
+
+          <div className="relative z-10 p-12 md:p-16 flex flex-col md:flex-row items-center justify-between gap-10">
+            {/* Left: copy */}
+            <div className="max-w-xl">
+              <span className="inline-block mb-4 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest">
+                For Event Organizers
+              </span>
+              <h2 className="text-4xl md:text-5xl font-black text-white leading-tight mb-4">
+                Turn your idea <br />
+                into a <span className="text-primary">sold-out</span> event.
+              </h2>
+              <p className="text-neutral-400 text-base md:text-lg leading-relaxed mb-8">
+                Create your event in minutes, set up tickets with multiple
+                tiers, collect payments, and send QR tickets — all in one place.
+                No extra tools needed.
+              </p>
+
+              <div className="flex flex-wrap gap-4">
+                <a
+                  href="/auth/register"
+                  className="inline-flex items-center gap-2 bg-primary hover:bg-orange-600 text-white px-7 py-3 rounded-full font-bold transition-all shadow-[0_0_25px_rgba(255,77,0,0.3)] hover:shadow-[0_0_35px_rgba(255,77,0,0.5)]"
+                >
+                  Get Started Free
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M5 12h14" />
+                    <path d="m12 5 7 7-7 7" />
+                  </svg>
+                </a>
+                <a
+                  href="/events"
+                  className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white px-7 py-3 rounded-full font-bold transition-all"
+                >
+                  Browse Events
+                </a>
+              </div>
+            </div>
+
+            {/* Right: stats */}
+            <div className="shrink-0 grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { value: "5 min", label: "to create an event" },
+                { value: "₦0", label: "upfront cost" },
+                { value: "QR", label: "ticket delivery" },
+                { value: "Live", label: "sales dashboard" },
+              ].map(({ value, label }) => (
+                <div
+                  key={label}
+                  className="bg-white/5 border border-white/5 rounded-2xl p-5 text-center hover:border-primary/20 hover:bg-primary/5 transition-colors"
+                >
+                  <p className="text-2xl font-black text-white mb-1">{value}</p>
+                  <p className="text-xs text-neutral-500">{label}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>

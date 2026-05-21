@@ -31,7 +31,26 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    const resData = response.data;
+    if (resData && typeof resData === "object" && "status" in resData && "data" in resData) {
+      if (resData.status === false) {
+        const errMsg = resData.message || "Operation failed";
+        toast.error(errMsg);
+        return Promise.reject({
+          response: {
+            ...response,
+            data: resData
+          }
+        });
+      }
+      return {
+        ...response,
+        data: resData.data
+      };
+    }
+    return response;
+  },
   (error) => {
     if (typeof window !== "undefined") {
       if (error.response) {
@@ -53,8 +72,8 @@ api.interceptors.response.use(
         ) {
           // Automatically fire error toast for 400+ failing mutations
           const msg =
-            error.response.data?.detail ||
             error.response.data?.message ||
+            error.response.data?.detail ||
             "Internal server error, try again";
           toast.error(msg);
         }
@@ -124,7 +143,6 @@ export const verifyPayment = async (reference: string) => {
 export type PublicEvent = Event;
 
 export const getMyEvents = async (): Promise<Event[]> => {
-  const token = localStorage.getItem("token");
   const response = await api.get("/events");
   return response.data;
 };

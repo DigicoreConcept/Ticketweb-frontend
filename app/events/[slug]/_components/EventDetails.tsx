@@ -12,18 +12,18 @@ interface EventDetailsProps {
 export default function EventDetails({ event, formattedDate, isCollapsed }: EventDetailsProps) {
   return (
     <div className="pt-10">
-      {/* Event card — image beside title/date/location (collapsed only) */}
-      {isCollapsed && (
-        <div className="flex flex-col sm:flex-row gap-6 p-5">
-          {/* Image */}
-          <div className="relative w-full sm:w-48 shrink-0 aspect-[4/5] rounded-2xl overflow-hidden shadow-xl border border-white/10 group">
+
+      {/* Identity card — only shows when hero is collapsed */}
+      <AnimateCard show={isCollapsed}>
+        <div className="flex flex-col sm:flex-row gap-6 mb-6 p-5 rounded-2xl border border-white/[0.06] bg-white/[0.02]">
+          {/* Portrait image */}
+          <div className="relative w-full sm:w-44 shrink-0 aspect-[4/5] rounded-2xl overflow-hidden shadow-xl border border-white/10 group">
             <img
               src={event.image_url}
               alt={event.title}
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            {/* Quick Actions */}
             <div className="absolute top-2 right-2 flex gap-1.5">
               <button className="p-2 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white hover:bg-primary transition-all active:scale-90">
                 <Heart className="w-4 h-4" />
@@ -34,12 +34,12 @@ export default function EventDetails({ event, formattedDate, isCollapsed }: Even
             </div>
           </div>
 
-          {/* Title + metadata */}
+          {/* Title + meta */}
           <div className="flex flex-col justify-center space-y-4">
             <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight leading-tight">
               {event.title}
             </h2>
-            <div className="flex flex-col gap-3 text-white/60 font-medium text-sm">
+            <div className="flex flex-col gap-3 text-white/60 text-sm font-medium">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-primary" />
                 <span>{formattedDate}</span>
@@ -51,9 +51,9 @@ export default function EventDetails({ event, formattedDate, isCollapsed }: Even
             </div>
           </div>
         </div>
-      )}
+      </AnimateCard>
 
-      {/* Description Section */}
+      {/* Description */}
       <div className="p-10 rounded-3xl relative overflow-hidden group">
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-50" />
 
@@ -72,7 +72,7 @@ export default function EventDetails({ event, formattedDate, isCollapsed }: Even
         />
       </div>
 
-      {/* Policy info bar */}
+      {/* Policy bar */}
       <div className="flex items-center justify-between p-6 rounded-2xl border border-dashed border-white/10 text-white/30 italic text-sm">
         <span>Tickets are non-refundable • ID required for entry</span>
         <span className="font-bold uppercase tracking-widest text-[10px]">Premium Experience</span>
@@ -81,3 +81,18 @@ export default function EventDetails({ event, formattedDate, isCollapsed }: Even
   );
 }
 
+/* Tiny helper — slides the identity card in/out without layout shift */
+function AnimateCard({ show, children }: { show: boolean; children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateRows: show ? "1fr" : "0fr",
+        opacity: show ? 1 : 0,
+        transition: "grid-template-rows 400ms ease, opacity 300ms ease",
+      }}
+    >
+      <div style={{ overflow: "hidden" }}>{children}</div>
+    </div>
+  );
+}

@@ -42,6 +42,7 @@ export interface EventBase {
   end_time: string;
   banner_image_url: string;
   image_url: string;
+  category?: string;
 }
 
 export interface TicketTier extends TicketTierBase {

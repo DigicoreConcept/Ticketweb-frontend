@@ -54,7 +54,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="mx-auto space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-white tracking-tight">Account Settings</h1>
         <p className="text-white/50 mt-2">Manage your profile details, security, and verification.</p>

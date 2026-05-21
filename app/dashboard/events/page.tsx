@@ -32,7 +32,7 @@ const EventPage = () => {
   return (
     <>
       {events.length === 0 ? (
-        <div className="text-center py-20 bg-white/5 rounded-2xl border border-dashed border-white/10">
+        <div className="text-center py-20 rounded-2xl">
           <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
             <Calendar className="w-8 h-8 text-neutral-600" />
           </div>

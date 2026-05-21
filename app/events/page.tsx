@@ -11,13 +11,14 @@ import {
   Filter,
   LayoutGrid,
   List,
-  ChevronDown,
+  ChevronLeft,
 } from "lucide-react";
 import { Event } from "@/lib/schema/eventTied";
 import { EventCard } from "@/components/landing/EventCard";
 import { getPublicEvents } from "@/lib/api";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import BackButton from "@/components/ui/BackButton";
 import { Suspense } from "react";
 
 const CATEGORIES = [
@@ -135,6 +136,12 @@ function EventsContent() {
       );
     }
 
+    if (activeCategory !== "All") {
+      result = result.filter(
+        (e) => e.category?.toLowerCase() === activeCategory.toLowerCase(),
+      );
+    }
+
     if (activeLocation !== "All Locations") {
       result = result.filter((e) =>
         e.location?.toLowerCase().includes(activeLocation.toLowerCase()),
@@ -154,6 +161,7 @@ function EventsContent() {
           <div className="flex items-center justify-between h-16 gap-6">
             {/* Page title */}
             <div className="flex items-center gap-3 shrink-0">
+              <BackButton />
               <h1 className="text-lg font-black text-white tracking-tight">
                 Events
               </h1>
@@ -345,9 +353,13 @@ function EventsContent() {
 
             {/* Grid */}
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <SkeletonCard key={i} />
+              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="rounded-2xl bg-white/[0.04] animate-pulse"
+                    style={{ aspectRatio: "3/4" }}
+                  />
                 ))}
               </div>
             ) : filtered.length === 0 ? (
@@ -384,7 +396,7 @@ function EventsContent() {
                 animate="visible"
                 variants={{
                   hidden: {},
-                  visible: { transition: { staggerChildren: 0.04 } },
+                  visible: { transition: { staggerChildren: 0.05 } },
                 }}
                 className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4"
               >
@@ -392,24 +404,25 @@ function EventsContent() {
                   <motion.div
                     key={event.id}
                     variants={{
-                      hidden: { opacity: 0, y: 16 },
+                      hidden: { opacity: 0, y: 20 },
                       visible: { opacity: 1, y: 0 },
                     }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 300,
-                      damping: 24,
-                    }}
+                    transition={{ type: "spring", stiffness: 280, damping: 22 }}
                   >
                     <EventCard
                       slug={event.slug}
                       title={event.title}
                       date={new Date(event.start_time).toLocaleDateString(
                         undefined,
-                        { weekday: "short", month: "short", day: "numeric" },
+                        {
+                          weekday: "short",
+                          month: "short",
+                          day: "numeric",
+                        },
                       )}
                       image={
                         event.banner_image_url ||
+                        event.image_url ||
                         "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=800&q=80"
                       }
                       price={
@@ -421,7 +434,7 @@ function EventsContent() {
                       }
                       location={event.location || "TBA"}
                       category="Music"
-                      isTrending={true}
+                      isTrending={false}
                     />
                   </motion.div>
                 ))}
