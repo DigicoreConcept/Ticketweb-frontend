@@ -421,8 +421,8 @@ function EventsContent() {
                         },
                       )}
                       image={
-                        event.banner_image_url ||
                         event.image_url ||
+                        event.banner_image_url ||
                         "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=800&q=80"
                       }
                       price={
