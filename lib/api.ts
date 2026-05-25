@@ -216,4 +216,56 @@ export const uploadImage = async (
   return response.data;
 };
 
+// ── Wallet & Stats ────────────────────────────────────────────────────────
+
+export interface WalletStats {
+  total_events: number;
+  total_tickets_sold: number;
+  total_revenue: number;
+  pending_balance: number;
+  available_balance: number;
+  recent_sales_count: number;
+}
+
+export interface WalletBalance {
+  available_balance: number;
+  pending_balance: number;
+  lifetime_earnings: number;
+}
+
+export interface Transaction {
+  id: string;
+  type: "TICKET_SALE" | "PAYOUT" | "PLATFORM_FEE" | "REFUND";
+  amount: number;          // positive = credit, negative = debit
+  status: "PENDING" | "COMPLETED" | "FAILED";
+  description: string;
+  reference_id: string;
+  created_at: string;
+}
+
+export const getRevenueSeries = async (period: string = "7d"): Promise<{name: string, revenue: number}[]> =>
+  (await api.get(`/wallet/revenue-series?period=${period}`)).data;
+
+export const getWalletStats   = async (): Promise<WalletStats>       => (await api.get("/wallet/stats")).data;
+export const getWallet        = async (): Promise<WalletBalance>     => (await api.get("/wallet/me")).data;
+export const getTransactions  = async (skip = 0, limit = 20): Promise<Transaction[]> =>
+  (await api.get(`/wallet/transactions?skip=${skip}&limit=${limit}`)).data;
+
+export const requestWithdrawal = async (payload: {
+  amount: number;
+  bank_name?: string;
+  account_number?: string;
+}): Promise<{ reference: string; amount: number; message: string }> =>
+  (await api.post("/wallet/withdraw", payload)).data;
+
+// ── User profile ──────────────────────────────────────────────────────────
+
+export const updateProfile = async (payload: { full_name: string }) =>
+  (await api.patch("/users/me", payload)).data;
+
+export const changePassword = async (payload: {
+  current_password: string;
+  new_password: string;
+}) => (await api.post("/auth/change-password", payload)).data;
+
 export default api;

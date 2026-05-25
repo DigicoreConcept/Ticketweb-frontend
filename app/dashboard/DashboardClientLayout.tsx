@@ -15,6 +15,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
+import { VerificationBanner } from "@/components/dashboard/VerificationBanner";
 
 export default function DashboardClientLayout({
   children,
@@ -204,7 +205,7 @@ export default function DashboardClientLayout({
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 bg-[#0A0A0A] relative">
         <DashboardHeader onMenuClick={() => setMobileMenuOpen(true)} />
-
+        <VerificationBanner />
         <main className="flex-1 overflow-y-auto p-8 relative z-10 scrollbar-hide">
           {children}
         </main>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { toast } from "@/lib/store/toastStore";
+import { updateProfile, changePassword } from "@/lib/api";
 import { User, Shield, Mail, CheckCircle, AlertCircle, Save } from "lucide-react";
 import FormSection from "@/components/ui/FormSection";
 
@@ -20,15 +21,20 @@ export default function SettingsPage() {
   const [isSavingPassword, setIsSavingPassword] = useState(false);
 
   // Verification State
-  const isVerified = false; // Stubbed as unverified
+  const isVerified = (user as any)?.is_verified || false;
   const [isResending, setIsResending] = useState(false);
 
   const handleProfileSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSavingProfile(true);
-    await new Promise((r) => setTimeout(r, 600)); // Stub delay
-    toast.success("Profile updated successfully");
-    setIsSavingProfile(false);
+    try {
+      await updateProfile({ full_name: fullName });
+      toast.success("Profile updated successfully");
+    } catch {
+      // error toast handled by interceptor
+    } finally {
+      setIsSavingProfile(false);
+    }
   };
 
   const handlePasswordSave = async (e: React.FormEvent) => {
@@ -38,12 +44,17 @@ export default function SettingsPage() {
       return;
     }
     setIsSavingPassword(true);
-    await new Promise((r) => setTimeout(r, 1000)); // Stub delay
-    toast.success("Password changed securely");
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-    setIsSavingPassword(false);
+    try {
+      await changePassword({ current_password: currentPassword, new_password: newPassword });
+      toast.success("Password changed securely");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch {
+      // error toast handled by interceptor
+    } finally {
+      setIsSavingPassword(false);
+    }
   };
 
   const handleResendVerification = async () => {

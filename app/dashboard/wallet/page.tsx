@@ -11,65 +11,104 @@ import {
   Banknote,
   CircleDot,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "@/lib/store/toastStore";
+import { getWallet, getTransactions, requestWithdrawal, WalletBalance, Transaction } from "@/lib/api";
+import { TransactionModal } from "@/components/dashboard/TransactionModal";
 
-const transactions = [
-  { id: 1, type: "Ticket Sale",    amount: "+₦85,000",   date: "Oct 27, 2026", status: "Completed",  credit: true  },
-  { id: 2, type: "Ticket Sale",    amount: "+₦120,000",  date: "Oct 26, 2026", status: "Completed",  credit: true  },
-  { id: 3, type: "Platform Fee",   amount: "-₦12,500",   date: "Oct 26, 2026", status: "Completed",  credit: false },
-  { id: 4, type: "Payout",         amount: "-₦450,000",  date: "Oct 28, 2026", status: "Completed",  credit: false },
-  { id: 5, type: "Ticket Sale",    amount: "+₦200,000",  date: "Oct 25, 2026", status: "Pending",    credit: true  },
-];
-
-const STAT_CARDS = [
-  {
-    label: "Available Balance",
-    value: "₦1,240,000",
-    sub: "+12.5% from last month",
-    subColor: "text-green-400",
-    icon: Wallet,
-    iconBg: "bg-primary/10",
-    iconColor: "text-primary",
-    highlight: true,
-  },
-  {
-    label: "Pending Clearance",
-    value: "₦320,500",
-    sub: "Expected within 3–5 days",
-    subColor: "text-white/40",
-    icon: Clock,
-    iconBg: "bg-yellow-500/10",
-    iconColor: "text-yellow-400",
-    highlight: false,
-  },
-  {
-    label: "Lifetime Earnings",
-    value: "₦8,450,000",
-    sub: "Across 12 hosted events",
-    subColor: "text-white/40",
-    icon: TrendingUp,
-    iconBg: "bg-blue-500/10",
-    iconColor: "text-blue-400",
-    highlight: false,
-  },
-];
 
 export default function WalletPage() {
+  const [wallet, setWallet] = useState<WalletBalance | null>(null);
+  const [walletLoading, setWalletLoading] = useState(true);
+
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [txLoading, setTxLoading] = useState(true);
+  const [txPage, setTxPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const PAGE_SIZE = 10;
+
+  const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
+
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [amount, setAmount] = useState("");
+
+  useEffect(() => {
+    getWallet()
+      .then(setWallet)
+      .finally(() => setWalletLoading(false));
+  }, []);
+
+  const loadTransactions = async (page = 0) => {
+    setTxLoading(true);
+    try {
+      const data = await getTransactions(page * PAGE_SIZE, PAGE_SIZE);
+      if (page === 0) setTransactions(data);
+      else setTransactions((prev) => [...prev, ...data]);
+      setHasMore(data.length === PAGE_SIZE);
+      setTxPage(page);
+    } catch {
+      // Error handled by interceptor
+    } finally {
+      setTxLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTransactions(0);
+  }, []);
 
   const handleWithdrawal = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsWithdrawing(true);
-    await new Promise((r) => setTimeout(r, 800));
-    toast.success("Withdrawal request submitted!");
-    setAmount("");
-    setIsWithdrawing(false);
+    try {
+      const result = await requestWithdrawal({ amount: Number(amount) });
+      toast.success(result.message);
+      setAmount("");
+      // Refresh wallet balances
+      getWallet().then(setWallet);
+      loadTransactions(0);
+    } catch {
+      // error toast already fired by axios interceptor
+    } finally {
+      setIsWithdrawing(false);
+    }
   };
 
+  const statCards = [
+    {
+      label: "Available Balance",
+      value: walletLoading ? "—" : `₦${wallet?.available_balance.toLocaleString() ?? 0}`,
+      sub: "Available for withdrawal",
+      subColor: "text-green-400",
+      icon: Wallet,
+      iconBg: "bg-primary/10",
+      iconColor: "text-primary",
+      highlight: true,
+    },
+    {
+      label: "Pending Clearance",
+      value: walletLoading ? "—" : `₦${wallet?.pending_balance.toLocaleString() ?? 0}`,
+      sub: "Expected within 3–5 days",
+      subColor: "text-white/40",
+      icon: Clock,
+      iconBg: "bg-yellow-500/10",
+      iconColor: "text-yellow-400",
+      highlight: false,
+    },
+    {
+      label: "Lifetime Earnings",
+      value: walletLoading ? "—" : `₦${wallet?.lifetime_earnings.toLocaleString() ?? 0}`,
+      sub: "Across hosted events",
+      subColor: "text-white/40",
+      icon: TrendingUp,
+      iconBg: "bg-blue-500/10",
+      iconColor: "text-blue-400",
+      highlight: false,
+    },
+  ];
+
   return (
-    <div className="space-y-8 pb-20 max-w-5xl">
+    <div className="space-y-8 pb-20">
 
       {/* ── Header ── */}
       <div>
@@ -81,7 +120,7 @@ export default function WalletPage() {
 
       {/* ── Stat Cards ── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {STAT_CARDS.map(({ label, value, sub, subColor, icon: Icon, iconBg, iconColor, highlight }, i) => (
+        {statCards.map(({ label, value, sub, subColor, icon: Icon, iconBg, iconColor, highlight }, i) => (
           <motion.div
             key={label}
             initial={{ opacity: 0, y: 16 }}
@@ -103,7 +142,11 @@ export default function WalletPage() {
               </div>
             </div>
             <div>
-              <p className="text-3xl font-black text-white tracking-tight">{value}</p>
+              {walletLoading ? (
+                <div className="h-9 w-32 bg-white/10 animate-pulse rounded-lg mt-1" />
+              ) : (
+                <p className="text-3xl font-black text-white tracking-tight">{value}</p>
+              )}
               <p className={`text-xs mt-1.5 ${subColor}`}>{sub}</p>
             </div>
           </motion.div>
@@ -125,53 +168,84 @@ export default function WalletPage() {
           </div>
 
           <div className="rounded-2xl border border-white/5 bg-white/[0.03] overflow-hidden">
-            {transactions.map((tx, idx) => (
-              <div
-                key={tx.id}
-                className={`flex items-center justify-between px-5 py-4 hover:bg-white/[0.03] transition-colors ${
-                  idx !== transactions.length - 1 ? "border-b border-white/[0.04]" : ""
-                }`}
-              >
-                <div className="flex items-center gap-4">
-                  {/* Icon */}
-                  <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-                      tx.credit ? "bg-green-500/10" : "bg-white/5"
-                    }`}
-                  >
-                    {tx.credit ? (
-                      <ArrowDownLeft className="w-4 h-4 text-green-400" />
-                    ) : (
-                      <ArrowUpRight className="w-4 h-4 text-white/40" />
-                    )}
-                  </div>
-
-                  <div>
-                    <p className="text-sm font-semibold text-white">{tx.type}</p>
-                    <p className="text-xs text-white/30">{tx.date}</p>
-                  </div>
-                </div>
-
-                <div className="text-right">
-                  <p
-                    className={`text-sm font-bold ${
-                      tx.credit ? "text-green-400" : "text-white/70"
-                    }`}
-                  >
-                    {tx.amount}
-                  </p>
-                  <span
-                    className={`inline-flex items-center gap-1 text-[10px] font-semibold ${
-                      tx.status === "Pending" ? "text-yellow-400" : "text-white/30"
-                    }`}
-                  >
-                    <CircleDot className="w-2.5 h-2.5" />
-                    {tx.status}
-                  </span>
-                </div>
+            {txLoading && transactions.length === 0 ? (
+              <div className="px-5 py-8 flex justify-center">
+                <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
               </div>
-            ))}
+            ) : transactions.length === 0 ? (
+              <div className="px-5 py-8 text-center text-white/40 text-sm">
+                No transactions yet.
+              </div>
+            ) : (
+              transactions.map((tx, idx) => {
+                const isCredit = tx.amount > 0;
+                return (
+                  <div
+                    key={tx.id}
+                    onClick={() => setSelectedTx(tx)}
+                    className={`flex items-center justify-between px-5 py-4 hover:bg-white/[0.05] transition-colors cursor-pointer ${
+                      idx !== transactions.length - 1 ? "border-b border-white/[0.04]" : ""
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      {/* Icon */}
+                      <div
+                        className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                          isCredit ? "bg-green-500/10" : "bg-white/5"
+                        }`}
+                      >
+                        {isCredit ? (
+                          <ArrowDownLeft className="w-4 h-4 text-green-400" />
+                        ) : (
+                          <ArrowUpRight className="w-4 h-4 text-white/40" />
+                        )}
+                      </div>
+
+                      <div>
+                        <p className="text-sm font-semibold text-white">
+                          {tx.type.replace("_", " ")}
+                        </p>
+                        <p className="text-xs text-white/30">
+                          {new Date(tx.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="text-right">
+                      <p
+                        className={`text-sm font-bold ${
+                          isCredit ? "text-green-400" : "text-white/70"
+                        }`}
+                      >
+                        {isCredit ? "+" : ""}₦{Math.abs(tx.amount).toLocaleString()}
+                      </p>
+                      <span
+                        className={`inline-flex items-center gap-1 text-[10px] font-semibold ${
+                          tx.status === "PENDING" ? "text-yellow-400" : 
+                          tx.status === "COMPLETED" ? "text-green-400" : "text-red-400"
+                        }`}
+                      >
+                        <CircleDot className="w-2.5 h-2.5" />
+                        {tx.status}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
+
+          {hasMore && transactions.length > 0 && (
+            <button
+              onClick={() => loadTransactions(txPage + 1)}
+              disabled={txLoading}
+              className="w-full py-3 rounded-xl border border-white/5 bg-white/[0.02] text-sm text-white/60 hover:bg-white/[0.05] hover:text-white transition-all disabled:opacity-50"
+            >
+              {txLoading ? "Loading..." : "Load More"}
+            </button>
+          )}
+
+          <TransactionModal transaction={selectedTx} onClose={() => setSelectedTx(null)} />
         </div>
 
         {/* Payout Panel */}
@@ -231,9 +305,15 @@ export default function WalletPage() {
                   ))}
                 </div>
 
+                {wallet && (
+                  <p className="text-xs text-white/30 mt-1 pl-[calc(28px+10px)]">
+                    Available: ₦{wallet.available_balance.toLocaleString()}
+                  </p>
+                )}
+                
                 <button
                   type="submit"
-                  disabled={isWithdrawing || !amount}
+                  disabled={isWithdrawing || !amount || Number(amount) > (wallet?.available_balance ?? 0)}
                   className="w-full py-3 rounded-xl bg-primary hover:bg-orange-600 text-white font-bold text-sm transition-all shadow-[0_0_20px_rgba(251,45,0,0.2)] hover:shadow-[0_0_28px_rgba(251,45,0,0.35)] active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none"
                 >
                   {isWithdrawing ? "Processing…" : "Withdraw Funds"}
