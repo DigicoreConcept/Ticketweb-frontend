@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   TicketTier,
   TicketType,
@@ -9,6 +9,7 @@ import {
   Event,
 } from "@/lib/schema/eventTied";
 import { ReservationItem } from "@/lib/schema/orderTied";
+import { getTakenSeats } from "@/lib/api";
 import { Ticket as TicketIcon, Check, Users, Sofa, Info } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -44,6 +45,11 @@ export default function TicketSelection({
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [selectedTierIds, setSelectedTierIds] = useState<string[]>([]);
   const [selectedSeats, setSelectedSeats] = useState<Record<string, string[]>>({});
+  const [takenSeats, setTakenSeats] = useState<{tier_id: string, seat_number: string | number, status: string}[]>([]);
+
+  useEffect(() => {
+    getTakenSeats(event.id).then(setTakenSeats).catch(console.error);
+  }, [event.id]);
 
   const calculateTotal = () => {
     return event.ticket_tiers?.reduce((sum, tier) => {
@@ -249,6 +255,21 @@ export default function TicketSelection({
                                 {Array.from({ length: seatingConfig.seats_per_row }).map((_, seatIndex) => {
                                   const label = `${rowLetter}${seatIndex + 1}`;
                                   const isSeatSelected = selectedSeats[tier.id]?.includes(label);
+                                  
+                                  const takenSeat = takenSeats.find(s => s.tier_id === tier.id && String(s.seat_number) === label);
+                                  
+                                  if (takenSeat) {
+                                    return (
+                                      <div
+                                        key={seatIndex}
+                                        className="w-7 h-7 rounded-lg text-[9px] font-bold flex items-center justify-center bg-white/10 text-white/20 cursor-not-allowed"
+                                        title={takenSeat.status === 'HELD' ? 'Held by another user' : 'Sold'}
+                                      >
+                                        {label}
+                                      </div>
+                                    );
+                                  }
+
                                   return (
                                     <button
                                       key={seatIndex}
@@ -256,7 +277,7 @@ export default function TicketSelection({
                                         e.stopPropagation();
                                         toggleSeat(tier.id, label);
                                       }}
-                                      className={`w-7 h-7 rounded-lg text-[9px] font-bold transition-all duration-300 ${
+                                      className={`w-7 h-7 rounded-lg text-[9px] font-bold flex items-center justify-center transition-all duration-300 ${
                                         isSeatSelected 
                                           ? "bg-primary text-white shadow-[0_0_12px_rgba(59,130,246,0.4)]"
                                           : "bg-white/5 border border-white/10 hover:border-white/30 text-white/40"

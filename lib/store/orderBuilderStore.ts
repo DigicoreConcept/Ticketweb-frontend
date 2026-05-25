@@ -30,15 +30,11 @@ function buildAttendeeSlots(
       }
     } else if (tier.type === TicketType.ASSIGNED_SEATING) {
       const seats = selectedSeats?.[tier.id] || [];
-      seats.forEach((seatLabel, i) => {
-        // Simple parser for "A1", "B2" etc.
-        const seatNumMatch = seatLabel.match(/\d+$/);
-        const seat_number = seatNumMatch ? parseInt(seatNumMatch[0]) : i + 1;
-
+      seats.forEach((seatLabel) => {
         slots.push({
           tier_id: tier.id,
           label: `${tier.name} — ${seatLabel}`,
-          seat_number,
+          seat_number: seatLabel,
         });
       });
     } else {

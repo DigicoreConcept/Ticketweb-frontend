@@ -2,7 +2,7 @@ export type Attendee = {
   name: string;
   email: string;
   phone?: string;
-  seat_number?: number;
+  seat_number?: string | number;
   table_number?: number;
 };
 

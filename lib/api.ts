@@ -100,6 +100,11 @@ export const getEventById = async (id: string): Promise<Event> => {
   return response.data;
 };
 
+export const getTakenSeats = async (eventId: string): Promise<{tier_id: string, seat_number: string | number, status: string}[]> => {
+  const response = await api.get(`/public/events/${eventId}/seats`);
+  return response.data;
+};
+
 export const createReservation = async (
   eventId: string,
   items: { tier_id: string; quantity: number }[],

@@ -86,7 +86,7 @@ function PaymentCallback() {
             <div>
                <p className="text-xs font-semibold text-gray-500 uppercase">Total Amount</p>
                <p className="font-mono text-lg font-medium text-gray-900">
-                    {(order?.total_amount / 100).toLocaleString('en-NG', { style: 'currency', currency: 'NGN' })}
+                    {(order?.total_amount).toLocaleString('en-NG', { style: 'currency', currency: 'NGN' })}
                </p>
             </div>
         </div>
