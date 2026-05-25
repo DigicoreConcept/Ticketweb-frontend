@@ -35,6 +35,7 @@ interface Guest {
   attendee_email: string;
   tier: {
     name: string;
+    type: string;
   };
   seat_number?: number;
   table_number?: number;
@@ -86,11 +87,14 @@ export default function EventStatsPage() {
         ]);
 
         if (eventRes.ok && statsRes.ok) {
-          setEvent(await eventRes.json());
-          setStats(await statsRes.json());
+          const statRes = await statsRes.json();
+          const eventsRes = await eventRes.json();
+          setEvent(eventsRes.data);
+          setStats(statRes.data);
         }
         if (guestsRes.ok) {
-          setGuests(await guestsRes.json());
+          const guests = await guestsRes.json();
+          setGuests(guests.data);
         }
       } catch (error) {
         console.error("Failed to fetch event data", error);
@@ -111,97 +115,111 @@ export default function EventStatsPage() {
 
   if (loading || loadingData || !eventId)
     return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      <div className="flex h-[80vh] items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
 
-  if (!event || !stats) return <div>Event not found</div>;
+  if (!event || !stats) return <div className="p-8 text-center text-neutral-400">Event not found</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-5xl mx-auto space-y-8">
-        <Link
-          href="/dashboard"
-          className="text-gray-500 hover:text-gray-900 flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back to Dashboard
-        </Link>
-
-        <div className="flex justify-between items-end border-b pb-6">
+    <div className="min-h-screen pb-20 text-white">
+      <div className="space-y-8">
+        <div className="flex flex-col md:flex-row justify-between md:items-end gap-4 border-b border-white/10 pb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{event.title}</h1>
-            <p className="text-gray-500 mt-1">Event Performance</p>
+            <h1 className="text-3xl font-black text-white tracking-tight">{event.title}</h1>
+            <p className="text-neutral-400 mt-2 text-sm">Event Performance & Guestlist</p>
           </div>
           <Link href={`/events/${event.slug}`} target="_blank">
-            <Button variant="outline" size="sm">
-              <ExternalLink className="w-4 h-4 mr-2" />
+            <button className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-medium transition-colors text-white">
+              <ExternalLink className="w-4 h-4" />
               View Public Page
-            </Button>
+            </button>
           </Link>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-100 rounded-full text-green-600">
-                <DollarSign className="w-6 h-6" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white/5 border border-white/5 rounded-2xl p-6 relative overflow-hidden group hover:border-white/10 transition-colors">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <DollarSign className="w-16 h-16 text-white" />
+            </div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-green-500/10 rounded-lg text-green-400">
+                  <DollarSign className="w-4 h-4" />
+                </div>
+                <span className="text-sm font-medium text-neutral-400">Total Revenue</span>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Total Revenue</p>
-                <p className="text-2xl font-bold">
+              <div className="flex items-end gap-2">
+                <span className="text-3xl font-black text-white tracking-tight">
                   ₦{stats.total_revenue.toLocaleString()}
-                </p>
+                </span>
               </div>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-100 rounded-full text-blue-600">
-                <Users className="w-6 h-6" />
+
+          <div className="bg-white/5 border border-white/5 rounded-2xl p-6 relative overflow-hidden group hover:border-white/10 transition-colors">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <Users className="w-16 h-16 text-white" />
+            </div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-blue-500/10 rounded-lg text-blue-400">
+                  <Users className="w-4 h-4" />
+                </div>
+                <span className="text-sm font-medium text-neutral-400">Tickets Sold</span>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Tickets Sold</p>
-                <p className="text-2xl font-bold">{stats.tickets_sold}</p>
+              <div className="flex items-end gap-2">
+                <span className="text-3xl font-black text-white tracking-tight">
+                  {stats.tickets_sold}
+                </span>
               </div>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-purple-100 rounded-full text-purple-600">
-                <Ticket className="w-6 h-6" />
+
+          <div className="bg-white/5 border border-white/5 rounded-2xl p-6 relative overflow-hidden group hover:border-white/10 transition-colors">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <Ticket className="w-16 h-16 text-white" />
+            </div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-purple-500/10 rounded-lg text-purple-400">
+                  <Ticket className="w-4 h-4" />
+                </div>
+                <span className="text-sm font-medium text-neutral-400">Tickets Available</span>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Tickets Available</p>
-                <p className="text-2xl font-bold">{stats.tickets_available}</p>
+              <div className="flex items-end gap-2">
+                <span className="text-3xl font-black text-white tracking-tight">
+                  {stats.tickets_available}
+                </span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white overflow-hidden rounded-xl shadow-sm border border-gray-100">
-          <div className="p-6 border-b flex justify-between items-center">
-            <h3 className="text-lg font-bold text-gray-900">Guestlist</h3>
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+        <div className="bg-white/5 border border-white/5 overflow-hidden rounded-2xl relative">
+          <div className="p-6 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+            <h3 className="text-lg font-bold text-white">Guestlist</h3>
+            <span className="px-3 py-1 bg-primary/10 text-primary rounded-full text-xs font-bold uppercase tracking-widest">
               {guests.length} Attendees
-            </p>
+            </span>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
+            <table className="w-full text-left whitespace-nowrap">
               <thead>
-                <tr className="bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                <tr className="bg-white/[0.03] text-xs font-semibold text-neutral-400 uppercase tracking-wider border-b border-white/5">
                   <th className="px-6 py-4">Attendee</th>
-                  <th className="px-6 py-4">Tier</th>
+                  <th className="px-6 py-4">Tier & Type</th>
                   <th className="px-6 py-4">Seat / Table</th>
                   <th className="px-6 py-4">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-white/[0.04]">
                 {guests.length === 0 ? (
                   <tr>
                     <td
                       colSpan={4}
-                      className="px-6 py-12 text-center text-gray-400 font-medium"
+                      className="px-6 py-12 text-center text-neutral-500 font-medium"
                     >
                       No tickets sold yet.
                     </td>
@@ -210,28 +228,33 @@ export default function EventStatsPage() {
                   guests.map((guest) => (
                     <tr
                       key={guest.id}
-                      className="hover:bg-gray-50/50 transition-colors"
+                      className="hover:bg-white/[0.02] transition-colors"
                     >
                       <td className="px-6 py-4">
-                        <p className="font-bold text-gray-900">
+                        <p className="font-semibold text-white">
                           {guest.attendee_name || "N/A"}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-neutral-500 mt-0.5">
                           {guest.attendee_email}
                         </p>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className="text-xs font-bold px-2 py-1 bg-gray-100 rounded-lg text-gray-600">
+                      <td className="px-6 py-4 flex flex-col items-start gap-1.5">
+                        <span className="text-xs font-bold px-2.5 py-1 bg-white/10 rounded-lg text-white">
                           {guest.tier.name}
                         </span>
+                        {guest.tier.type && (
+                          <span className="text-[10px] text-neutral-500 font-semibold uppercase tracking-wider">
+                            {guest.tier.type.replace("_", " ")}
+                          </span>
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         {guest.shared_attendee ? (
-                          <span className="text-[10px] font-black px-2 py-1 bg-blue-100 text-blue-600 rounded uppercase tracking-tighter">
+                          <span className="text-[10px] font-black px-2 py-1 bg-blue-500/10 text-blue-400 rounded border border-blue-500/20 uppercase tracking-tighter">
                             COMBINED — T-{guest.table_number}
                           </span>
                         ) : (
-                          <span className="text-sm font-medium text-gray-600">
+                          <span className="text-sm font-medium text-neutral-400">
                             {guest.seat_number
                               ? `Seat ${guest.seat_number}`
                               : guest.table_number
@@ -241,7 +264,7 @@ export default function EventStatsPage() {
                         )}
                       </td>
                       <td className="px-6 py-4">
-                        <span className="text-[10px] font-black px-2 py-1 bg-green-100 text-green-600 rounded uppercase tracking-widest">
+                        <span className="text-[10px] font-black px-2.5 py-1 bg-green-500/10 text-green-400 border border-green-500/20 rounded-full uppercase tracking-widest">
                           {guest.status}
                         </span>
                       </td>
@@ -253,27 +276,29 @@ export default function EventStatsPage() {
           </div>
         </div>
 
-        <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-          <h3 className="text-lg font-bold mb-4">Share Your Event</h3>
-          <div className="flex gap-4 items-center">
+        <div className="bg-white/5 border border-white/5 p-8 rounded-2xl relative overflow-hidden">
+          <h3 className="text-lg font-bold text-white mb-6">Share Your Event</h3>
+          <div className="flex flex-col md:flex-row gap-4 items-center">
             <input
               readOnly
               value={`${typeof window !== "undefined" ? window.location.origin : ""}/events/${event.slug}`}
-              className="flex-1 p-3 border rounded-lg bg-gray-50 text-gray-600"
+              className="flex-1 w-full p-3 border border-white/10 rounded-xl bg-black/50 text-neutral-300 outline-none focus:border-primary/50 transition-colors"
             />
-            <Button onClick={copyLink} className="min-w-[120px]">
+            <button 
+              onClick={copyLink} 
+              className="w-full md:w-auto min-w-[140px] flex items-center justify-center gap-2 py-3 px-5 rounded-xl bg-primary hover:bg-orange-600 text-white font-bold text-sm transition-all"
+            >
               {copied ? (
-                <Check className="w-4 h-4 mr-2" />
+                <Check className="w-4 h-4" />
               ) : (
-                <Copy className="w-4 h-4 mr-2" />
+                <Copy className="w-4 h-4" />
               )}
               {copied ? "Copied!" : "Copy Link"}
-            </Button>
+            </button>
           </div>
-          <div className="mt-6 flex gap-4">
-            <Button
-              variant="outline"
-              className="flex-1"
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button
+              className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] text-sm text-white transition-colors"
               onClick={() =>
                 window.open(
                   `https://twitter.com/intent/tweet?text=Check out ${event.title}&url=${window.location.origin}/events/${event.slug}`,
@@ -282,10 +307,9 @@ export default function EventStatsPage() {
               }
             >
               Share on Twitter
-            </Button>
-            <Button
-              variant="outline"
-              className="flex-1"
+            </button>
+            <button
+              className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] text-sm text-white transition-colors"
               onClick={() =>
                 window.open(
                   `https://www.facebook.com/sharer/sharer.php?u=${window.location.origin}/events/${event.slug}`,
@@ -294,10 +318,9 @@ export default function EventStatsPage() {
               }
             >
               Share on Facebook
-            </Button>
-            <Button
-              variant="outline"
-              className="flex-1"
+            </button>
+            <button
+              className="flex items-center justify-center gap-2 py-3 px-4 rounded-xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] text-sm text-white transition-colors"
               onClick={() =>
                 window.open(
                   `https://wa.me/?text=Check out ${event.title} ${window.location.origin}/events/${event.slug}`,
@@ -306,7 +329,7 @@ export default function EventStatsPage() {
               }
             >
               Share on WhatsApp
-            </Button>
+            </button>
           </div>
         </div>
       </div>

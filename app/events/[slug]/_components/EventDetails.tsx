@@ -2,6 +2,7 @@
 
 import { Info, Share2, Heart, Calendar, MapPin } from "lucide-react";
 import { PublicEvent } from "@/lib/api";
+import LocationDisplay from "@/components/ui/LocationDisplay";
 
 interface EventDetailsProps {
   event: PublicEvent;
@@ -69,6 +70,21 @@ export default function EventDetails({ event, formattedDate, isCollapsed }: Even
           dangerouslySetInnerHTML={{
             __html: event.description || "No description provided.",
           }}
+        />
+      </div>
+
+      {/* Location Map Section */}
+      <div className="p-10 rounded-3xl mt-6 relative overflow-hidden group border border-white/[0.06] bg-white/[0.02]">
+        <div className="flex items-center gap-4 mb-8">
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <MapPin className="w-6 h-6 text-primary" />
+          </div>
+          <h2 className="text-2xl font-black text-white tracking-tight">Location</h2>
+        </div>
+        
+        <LocationDisplay 
+          locationText={event.location} 
+          locationData={event.location_data} 
         />
       </div>
 

@@ -11,6 +11,7 @@ import FormSection from "@/components/ui/FormSection";
 import { EventCreate } from "@/lib/schema/eventTied";
 import { createEvent, updateEvent } from "@/lib/api";
 import { ClipLoader } from "@/components/ui/ClipLoader";
+import LocationPicker from "@/components/ui/LocationPicker";
 
 const basicsSchema = z
   .object({
@@ -22,6 +23,7 @@ const basicsSchema = z
     description: z.string().optional(),
     country: z.string().min(3, "Country is required"),
     location: z.string().min(3, "Location is required"),
+    locationData: z.any().optional(),
     startDate: z.string().min(1, "Start date is required"),
     startHour: z.string().min(1, "Hour is required"),
     startMinute: z.string().min(1, "Minute is required"),
@@ -84,6 +86,7 @@ export default function StepBasics() {
     description,
     country,
     location,
+    locationData,
     startTime,
     endTime,
     updateBasics,
@@ -127,6 +130,7 @@ export default function StepBasics() {
       description,
       country: country || "Nigeria",
       location,
+      locationData,
       startDate: defaultStart.date,
       startHour: defaultStart.hour,
       startMinute: defaultStart.minute,
@@ -164,6 +168,7 @@ export default function StepBasics() {
       description: data.description || "",
       country: data.country,
       location: data.location,
+      location_data: data.locationData || locationData,
       start_time: `${data.startDate}T${startH.toString().padStart(2, "0")}:${data.startMinute}:00`,
       end_time: `${data.endDate}T${endH.toString().padStart(2, "0")}:${data.endMinute}:00`,
       banner_image_url: "",
@@ -190,6 +195,7 @@ export default function StepBasics() {
         description: payload.description,
         country: payload.country,
         location: payload.location,
+        locationData: payload.location_data,
         startTime: payload.start_time,
         endTime: payload.end_time,
       });
@@ -287,16 +293,20 @@ export default function StepBasics() {
               {/* Location */}
               <div>
                 <label className={labelClass}>Venue & Location</label>
-                <input
-                  {...register("location")}
-                  className={inputClass}
-                  placeholder="e.g. Eko Hotel, Lagos"
+                <Controller
+                  name="location"
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <LocationPicker
+                      locationData={watch("locationData")}
+                      onChange={(newLoc, newLocData) => {
+                        field.onChange(newLoc);
+                        setValue("locationData", newLocData);
+                      }}
+                      error={fieldState.error?.message}
+                    />
+                  )}
                 />
-                {errors.location && (
-                  <p className="text-orange-400 text-xs mt-1.5 font-medium">
-                    {errors.location.message}
-                  </p>
-                )}
               </div>
             </FormSection>
 

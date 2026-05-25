@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { TicketType, TicketConfig, Event } from "../schema/eventTied";
+import { TicketType, TicketConfig, Event, LocationData } from "../schema/eventTied";
 
 export interface TicketTier {
   id?: string; // Optional for new tiers
@@ -19,6 +19,7 @@ interface EventBuilderState {
   description: string;
   country: string;
   location: string;
+  locationData?: LocationData;
   startTime: string; // ISO string
   endTime: string; // ISO string
   // Ticketing
@@ -50,6 +51,7 @@ export const useEventBuilderStore = create<EventBuilderState>((set) => ({
   description: "",
   country: "",
   location: "",
+  locationData: undefined,
   startTime: "",
   endTime: "",
   ticketTiers: [],
@@ -92,6 +94,7 @@ export const useEventBuilderStore = create<EventBuilderState>((set) => ({
       description: event.description || "",
       country: event.country || "Nigeria",
       location: event.location || "",
+      locationData: event.location_data,
       startTime: event.start_time || "",
       endTime: event.end_time || "",
       bannerImageUrl: event.banner_image_url || "",
@@ -119,6 +122,7 @@ export const useEventBuilderStore = create<EventBuilderState>((set) => ({
       description: "",
       country: "",
       location: "",
+      locationData: undefined,
       startTime: "",
       endTime: "",
       ticketTiers: [],

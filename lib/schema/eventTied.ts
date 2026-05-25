@@ -32,6 +32,13 @@ export type TicketConfig =
   | AssignedSeatingConfig
   | null;
 
+export interface LocationData {
+  formatted_address: string;
+  lat: number;
+  lng: number;
+  place_id?: string;
+}
+
 export interface EventBase {
   title: string;
   slug: string;
@@ -43,6 +50,7 @@ export interface EventBase {
   banner_image_url: string;
   image_url: string;
   category?: string;
+  location_data?: LocationData;
 }
 
 export interface TicketTier extends TicketTierBase {

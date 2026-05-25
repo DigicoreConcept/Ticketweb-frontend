@@ -122,7 +122,7 @@ export default function StepTicketing() {
     addTicketTier({
       name: data.name,
       type: data.type,
-      base_price: Math.round(data.price * 100),
+      base_price: data.price,
       quantity_available: data.quantity,
       config: config,
       allow_combined_names: data.allowCombinedNames,
