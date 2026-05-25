@@ -85,8 +85,15 @@ api.interceptors.response.use(
   },
 );
 
-export const getPublicEvents = async (): Promise<Event[]> => {
-  const response = await api.get("/public/events");
+export interface PublicEventsParams {
+  category?: string;
+  tags?: string;
+  location?: string;
+  name?: string;
+}
+
+export const getPublicEvents = async (params?: PublicEventsParams): Promise<Event[]> => {
+  const response = await api.get("/public/events", { params });
   return response.data;
 };
 

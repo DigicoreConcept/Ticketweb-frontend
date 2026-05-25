@@ -50,6 +50,7 @@ export interface EventBase {
   banner_image_url: string;
   image_url: string;
   category?: string;
+  tags?: string;
   location_data?: LocationData;
 }
 

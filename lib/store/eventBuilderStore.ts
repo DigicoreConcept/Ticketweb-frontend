@@ -20,6 +20,8 @@ interface EventBuilderState {
   country: string;
   location: string;
   locationData?: LocationData;
+  category: string;
+  tags: string;
   startTime: string; // ISO string
   endTime: string; // ISO string
   // Ticketing
@@ -52,6 +54,8 @@ export const useEventBuilderStore = create<EventBuilderState>((set) => ({
   country: "",
   location: "",
   locationData: undefined,
+  category: "",
+  tags: "",
   startTime: "",
   endTime: "",
   ticketTiers: [],
@@ -95,6 +99,8 @@ export const useEventBuilderStore = create<EventBuilderState>((set) => ({
       country: event.country || "Nigeria",
       location: event.location || "",
       locationData: event.location_data,
+      category: event.category || "",
+      tags: event.tags || "",
       startTime: event.start_time || "",
       endTime: event.end_time || "",
       bannerImageUrl: event.banner_image_url || "",
@@ -123,6 +129,8 @@ export const useEventBuilderStore = create<EventBuilderState>((set) => ({
       country: "",
       location: "",
       locationData: undefined,
+      category: "",
+      tags: "",
       startTime: "",
       endTime: "",
       ticketTiers: [],

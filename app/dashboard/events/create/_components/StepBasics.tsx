@@ -24,6 +24,8 @@ const basicsSchema = z
     country: z.string().min(3, "Country is required"),
     location: z.string().min(3, "Location is required"),
     locationData: z.any().optional(),
+    category: z.string().optional(),
+    tags: z.string().optional(),
     startDate: z.string().min(1, "Start date is required"),
     startHour: z.string().min(1, "Hour is required"),
     startMinute: z.string().min(1, "Minute is required"),
@@ -87,6 +89,8 @@ export default function StepBasics() {
     country,
     location,
     locationData,
+    category,
+    tags,
     startTime,
     endTime,
     updateBasics,
@@ -131,6 +135,8 @@ export default function StepBasics() {
       country: country || "Nigeria",
       location,
       locationData,
+      category,
+      tags,
       startDate: defaultStart.date,
       startHour: defaultStart.hour,
       startMinute: defaultStart.minute,
@@ -169,6 +175,8 @@ export default function StepBasics() {
       country: data.country,
       location: data.location,
       location_data: data.locationData || locationData,
+      category: data.category || "",
+      tags: data.tags || "",
       start_time: `${data.startDate}T${startH.toString().padStart(2, "0")}:${data.startMinute}:00`,
       end_time: `${data.endDate}T${endH.toString().padStart(2, "0")}:${data.endMinute}:00`,
       banner_image_url: "",
@@ -196,6 +204,8 @@ export default function StepBasics() {
         country: payload.country,
         location: payload.location,
         locationData: payload.location_data,
+        category: payload.category,
+        tags: payload.tags,
         startTime: payload.start_time,
         endTime: payload.end_time,
       });
@@ -270,6 +280,35 @@ export default function StepBasics() {
                     {errors.slug.message}
                   </p>
                 )}
+              </div>
+
+              {/* Category */}
+              <div>
+                <label className={labelClass}>Category</label>
+                <select
+                  {...register("category")}
+                  className={`${inputClass} appearance-none cursor-pointer`}
+                >
+                  <option value="" className="text-amber-950">Select a category</option>
+                  <option value="Music" className="text-amber-950">Music</option>
+                  <option value="Technology" className="text-amber-950">Technology</option>
+                  <option value="Business" className="text-amber-950">Business</option>
+                  <option value="Arts & Culture" className="text-amber-950">Arts & Culture</option>
+                  <option value="Sports & Fitness" className="text-amber-950">Sports & Fitness</option>
+                  <option value="Food & Drink" className="text-amber-950">Food & Drink</option>
+                  <option value="Other" className="text-amber-950">Other</option>
+                </select>
+              </div>
+
+              {/* Tags */}
+              <div>
+                <label className={labelClass}>Tags</label>
+                <input
+                  {...register("tags")}
+                  className={inputClass}
+                  placeholder="e.g. concert, outdoor, afrobeats"
+                />
+                <p className="text-white/30 text-[10px] mt-1.5 uppercase font-medium tracking-wider">Separate tags with commas</p>
               </div>
             </FormSection>
 

@@ -100,14 +100,29 @@ function EventsContent() {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(initialQuery);
+  const [debouncedSearch, setDebouncedSearch] = useState(initialQuery);
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeLocation, setActiveLocation] = useState("All Locations");
   const [showFilters, setShowFilters] = useState(false);
 
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [search]);
+
   useEffect(() => {
     async function fetchEvents() {
       try {
-        const data = await getPublicEvents();
+        setLoading(true);
+        const params: any = {};
+        if (debouncedSearch.trim()) params.name = debouncedSearch.trim();
+        if (activeCategory !== "All") params.category = activeCategory;
+        if (activeLocation !== "All Locations") params.location = activeLocation;
+
+        const data = await getPublicEvents(params);
         setEvents(data);
       } catch (error) {
         console.error("Failed to fetch events", error);
@@ -116,40 +131,13 @@ function EventsContent() {
       }
     }
     fetchEvents();
-  }, []);
+  }, [debouncedSearch, activeCategory, activeLocation]);
 
   // Sync with URL changes
   useEffect(() => {
     const q = searchParams.get("q");
     if (q) setSearch(q);
   }, [searchParams]);
-
-  const filtered = useMemo(() => {
-    let result = events;
-
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      result = result.filter(
-        (e) =>
-          e.title.toLowerCase().includes(q) ||
-          e.location?.toLowerCase().includes(q),
-      );
-    }
-
-    if (activeCategory !== "All") {
-      result = result.filter(
-        (e) => e.category?.toLowerCase() === activeCategory.toLowerCase(),
-      );
-    }
-
-    if (activeLocation !== "All Locations") {
-      result = result.filter((e) =>
-        e.location?.toLowerCase().includes(activeLocation.toLowerCase()),
-      );
-    }
-
-    return result;
-  }, [events, search, activeCategory, activeLocation]);
 
   const trendingEvents = useMemo(() => events.slice(0, 5), [events]);
 
@@ -167,7 +155,7 @@ function EventsContent() {
               </h1>
               {!loading && (
                 <span className="text-xs font-bold text-white/30 bg-white/5 px-2.5 py-1 rounded-full">
-                  {filtered.length}
+                  {events.length}
                 </span>
               )}
             </div>
@@ -345,8 +333,8 @@ function EventsContent() {
 
               <span className="text-xs font-medium text-white/20">
                 {!loading &&
-                  `${filtered.length} ${
-                    filtered.length === 1 ? "result" : "results"
+                  `${events.length} ${
+                    events.length === 1 ? "result" : "results"
                   }`}
               </span>
             </div>
@@ -362,7 +350,7 @@ function EventsContent() {
                   />
                 ))}
               </div>
-            ) : filtered.length === 0 ? (
+            ) : events.length === 0 ? (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -400,7 +388,7 @@ function EventsContent() {
                 }}
                 className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4"
               >
-                {filtered.map((event) => (
+                {events.map((event) => (
                   <motion.div
                     key={event.id}
                     variants={{

@@ -3,8 +3,27 @@
 import { motion } from "framer-motion";
 import { Search, MapPin, Calendar } from "lucide-react";
 import { TubesBackground } from "@/components/ui/TubesBackground";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function HeroSection() {
+  const router = useRouter();
+  const [query, setQuery] = useState("");
+  const [location, setLocation] = useState("All Locations");
+
+  const handleSearch = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const params = new URLSearchParams();
+    if (query.trim()) params.append("q", query.trim());
+    if (location && location !== "All Locations") params.append("location", location);
+    
+    router.push(`/events?${params.toString()}`);
+  };
+
+  const handleTagClick = (tag: string) => {
+    router.push(`/events?q=${encodeURIComponent(tag)}`);
+  };
+
   return (
     <div className="relative h-screen sm:h-[80vh] w-full overflow-hidden pointer-events-auto">
       <TubesBackground className="h-full w-full">
@@ -32,16 +51,19 @@ export function HeroSection() {
             </motion.p>
 
             {/* Search Bar */}
-            <motion.div
+            <motion.form
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.5, type: "spring" }}
+              onSubmit={handleSearch}
               className="pointer-events-auto relative max-w-2xl mx-auto bg-white/5 backdrop-blur-xl border border-white/10 rounded-full p-2 flex items-center shadow-2xl"
             >
               <div className="flex-1 flex items-center px-4 border-r border-white/10">
                 <Search className="w-5 h-5 text-neutral-400 mr-3" />
                 <input
                   type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search events, artists..."
                   className="w-full bg-transparent border-none outline-none text-white placeholder-neutral-500"
                 />
@@ -49,24 +71,30 @@ export function HeroSection() {
 
               <div className="hidden md:flex items-center px-4 border-r border-white/10">
                 <MapPin className="w-4 h-4 text-neutral-400 mr-2" />
-                <select className="bg-transparent border-none outline-none text-white text-sm cursor-pointer transition-colors">
-                  <option className="bg-neutral-900">Lagos</option>
-                  <option className="bg-neutral-900">Abuja</option>
-                  <option className="bg-neutral-900">London</option>
+                <select 
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="bg-transparent border-none outline-none text-white text-sm cursor-pointer transition-colors"
+                >
+                  <option value="All Locations" className="bg-neutral-900">All Locations</option>
+                  <option value="Lagos" className="bg-neutral-900">Lagos</option>
+                  <option value="Abuja" className="bg-neutral-900">Abuja</option>
+                  <option value="London" className="bg-neutral-900">London</option>
+                  <option value="New York" className="bg-neutral-900">New York</option>
                 </select>
               </div>
 
               <div className="hidden md:flex items-center px-4">
                 <Calendar className="w-4 h-4 text-neutral-400 mr-2" />
-                <span className="text-white text-sm cursor-pointer transition-colors">
+                <span className="text-white text-sm cursor-pointer transition-colors opacity-50">
                   Any Date
                 </span>
               </div>
 
-              <button className="bg-primary hover:bg-orange-600 text-white rounded-full p-3 px-6 font-bold transition-all shadow-[0_0_20px_rgba(255,77,0,0.3)] hover:shadow-[0_0_30px_rgba(255,77,0,0.5)]">
+              <button type="submit" className="bg-primary hover:bg-orange-600 text-white rounded-full p-3 px-6 font-bold transition-all shadow-[0_0_20px_rgba(255,77,0,0.3)] hover:shadow-[0_0_30px_rgba(255,77,0,0.5)]">
                 Search
               </button>
-            </motion.div>
+            </motion.form>
 
             {/* Trending Tags */}
             <motion.div
@@ -85,6 +113,7 @@ export function HeroSection() {
               ].map((tag, i) => (
                 <button
                   key={i}
+                  onClick={() => handleTagClick(tag)}
                   className="px-4 py-1.5 
                   rounded-full 
                   bg-white/10 
