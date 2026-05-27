@@ -9,6 +9,7 @@ export interface TicketTierBase {
   type: TicketType;
   base_price: number;
   quantity_available: number;
+  is_free?: boolean;
   config?: TicketConfig;
   allow_combined_names?: boolean;
 }

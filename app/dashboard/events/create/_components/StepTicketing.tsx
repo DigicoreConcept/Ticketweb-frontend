@@ -30,6 +30,7 @@ const ticketTierSchema = z
     row_count: z.number().optional(),
     seats_per_row: z.number().optional(),
     allowCombinedNames: z.boolean().optional(),
+    isFree: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.type === TicketType.TABLE) {
@@ -101,10 +102,12 @@ export default function StepTicketing() {
       quantity: 100,
       seatsPerTable: 5,
       allowCombinedNames: false,
+      isFree: false,
     },
   });
 
   const selectedType = watch("type");
+  const isFreeTicket = watch("isFree");
 
   // Logic to ADD a ticket to the local list (Zustand)
   const ticketSubmit = (data: TicketTierFormValues) => {
@@ -124,6 +127,7 @@ export default function StepTicketing() {
       type: data.type,
       base_price: data.price,
       quantity_available: data.quantity,
+      is_free: data.isFree,
       config: config,
       allow_combined_names: data.allowCombinedNames,
     });
@@ -188,13 +192,14 @@ export default function StepTicketing() {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div>
+              <div className={isFreeTicket ? "opacity-50 pointer-events-none" : ""}>
                 <label className={labelClass}>Price</label>
                 <input
                   type="number"
                   {...register("price", { valueAsNumber: true })}
                   className={inputClass}
                   placeholder="Price ₦"
+                  disabled={isFreeTicket}
                 />
               </div>
 
@@ -273,6 +278,21 @@ export default function StepTicketing() {
                 </div>
               </div>
             )}
+
+            <div className="flex items-center gap-3 p-4 rounded-xl border border-white/10 bg-white/[0.02]">
+              <div className="flex-1">
+                <p className="text-sm font-bold text-white">Free Ticket</p>
+                <p className="text-xs text-white/40">This ticket tier will be free of charge</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  {...register("isFree")}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+              </label>
+            </div>
 
             <div className="flex items-center gap-3 p-4 rounded-xl border border-white/10 bg-white/[0.02]">
               <div className="flex-1">
@@ -368,7 +388,7 @@ export default function StepTicketing() {
                               {meta.label}
                             </span>
                             <span className="text-white/40 text-xs font-medium">
-                              ₦{(tier.base_price / 100).toFixed(2)}
+                              {tier.is_free ? "Free" : `₦${(tier.base_price / 100).toFixed(2)}`}
                             </span>
                             <span className="text-white/30 text-xs">
                               Qty: {tier.quantity_available}

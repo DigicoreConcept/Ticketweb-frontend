@@ -7,6 +7,7 @@ export interface TicketTier {
   type: TicketType;
   base_price: number; // in cents
   quantity_available: number;
+  is_free?: boolean;
   config?: TicketConfig;
   allow_combined_names?: boolean;
 }
@@ -114,6 +115,7 @@ export const useEventBuilderStore = create<EventBuilderState>((set) => ({
             type: t.type,
             base_price: t.base_price,
             quantity_available: t.quantity_available,
+            is_free: t.is_free,
             config: t.config,
             allow_combined_names: t.allow_combined_names,
           }))

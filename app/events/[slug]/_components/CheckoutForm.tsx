@@ -69,7 +69,9 @@ export default function CheckoutForm({
         send_to_attendees: sendToAttendees === true
       });
 
-      if (response.authorization_url) {
+      if (response.status === "COMPLETED") {
+        onSuccess(response);
+      } else if (response.authorization_url) {
         redirectTo(response.authorization_url);
       } else {
         setError("Payment initialization failed. No authorization URL returned.");

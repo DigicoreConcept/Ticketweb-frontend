@@ -11,10 +11,14 @@ export const DashboardHeader = ({ onMenuClick }: { onMenuClick?: () => void }) =
   const pathname = usePathname();
 
   // Generate breadcrumbs from pathname
-  const breadcrumbs = pathname
-    .split("/")
-    .filter((segment) => segment !== "")
-    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1));
+  const pathSegments = pathname.split("/").filter(Boolean);
+  const breadcrumbs = pathSegments.map((segment, index) => {
+    const url = `/${pathSegments.slice(0, index + 1).join("/")}`;
+    return {
+      name: segment.charAt(0).toUpperCase() + segment.slice(1),
+      url,
+    };
+  });
 
   return (
     <header className="h-16 border-b border-white/5 bg-black/50 backdrop-blur-xl flex items-center justify-between px-6 sticky top-0 z-40">
@@ -30,11 +34,17 @@ export const DashboardHeader = ({ onMenuClick }: { onMenuClick?: () => void }) =
         )}
         <div className="flex items-center gap-2 text-sm text-neutral-400">
           {breadcrumbs.map((crumb, index) => (
-            <React.Fragment key={crumb}>
+            <React.Fragment key={crumb.url}>
               {index > 0 && <span className="text-neutral-600">/</span>}
-              <span className={index === breadcrumbs.length - 1 ? "text-white font-medium" : ""}>
-                {crumb}
-              </span>
+              {index === breadcrumbs.length - 1 ? (
+                <span className="text-white font-medium">
+                  {crumb.name}
+                </span>
+              ) : (
+                <Link href={crumb.url} className="hover:text-white transition-colors">
+                  {crumb.name}
+                </Link>
+              )}
             </React.Fragment>
           ))}
         </div>

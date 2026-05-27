@@ -91,19 +91,21 @@ export default function Home() {
                       },
                     )}
                     image={
-                      event.banner_image_url ||
                       event.image_url ||
+                      event.banner_image_url ||
                       "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=800&q=80"
                     }
                     price={
                       event.ticket_tiers && event.ticket_tiers.length > 0
-                        ? `From ₦${Math.min(
-                            ...event.ticket_tiers.map((t) => t.base_price),
-                          ).toLocaleString()}`
+                        ? event.ticket_tiers.some((t) => t.is_free)
+                          ? "Free"
+                          : `From ₦${Math.min(
+                              ...event.ticket_tiers.map((t) => t.base_price),
+                            ).toLocaleString()}`
                         : "Free"
                     }
                     location={event.location || "TBA"}
-                    category="Music"
+                    category={event.category || "General"}
                     isTrending
                   />
                 </SwiperSlide>
