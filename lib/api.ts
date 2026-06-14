@@ -280,4 +280,23 @@ export const changePassword = async (payload: {
   new_password: string;
 }) => (await api.post("/auth/change-password", payload)).data;
 
+// ── Admin Endpoints ────────────────────────────────────────────────────────
+
+export const getAdminOrders = async (params?: any) => (await api.get("/admin/orders", { params })).data;
+export const getAdminOrder = async (id: string) => (await api.get(`/admin/orders/${id}`)).data;
+export const refundAdminOrder = async (id: string, payload: { amount: number; reason: string }) => 
+  (await api.post(`/admin/orders/${id}/refund`, payload)).data;
+
+export const getAdminPayouts = async (params?: any) => (await api.get("/admin/payouts", { params })).data;
+export const approveAdminPayout = async (ref: string) => (await api.post(`/admin/payouts/${ref}/approve`)).data;
+export const rejectAdminPayout = async (ref: string, reason: string) => 
+  (await api.post(`/admin/payouts/${ref}/reject`, { reason })).data;
+
+export const getAdminTransactions = async (params?: any) => (await api.get("/admin/transactions", { params })).data;
+
+export const getAdminAuditLogs = async (params?: any) => (await api.get("/admin/audit-log", { params })).data;
+
+export const getAdminPlatformSettings = async () => (await api.get("/admin/settings")).data;
+export const updateAdminPlatformSettings = async (payload: any) => (await api.patch("/admin/settings", payload)).data;
+
 export default api;
