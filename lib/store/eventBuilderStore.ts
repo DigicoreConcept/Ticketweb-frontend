@@ -5,7 +5,7 @@ export interface TicketTier {
   id?: string; // Optional for new tiers
   name: string;
   type: TicketType;
-  base_price: number; // in cents
+  base_price: number; // in naira
   quantity_available: number;
   is_free?: boolean;
   config?: TicketConfig;

@@ -20,19 +20,33 @@ import { createBulkTicketTier, deleteBulkTicketTiers } from "@/lib/api";
 import { useState } from "react";
 import { ClipLoader } from "@/components/ui/ClipLoader";
 
+// NaN guard: disabled/hidden inputs return NaN with valueAsNumber — coerce to 0
+const nanToZero = (v: unknown) =>
+  typeof v === "number" && isNaN(v) ? 0 : v;
+
 const ticketTierSchema = z
   .object({
     name: z.string().min(1, "Name is required"),
     type: z.nativeEnum(TicketType),
-    price: z.number().min(0, "Price must be positive"),
-    quantity: z.number().min(1, "Quantity must be at least 1"),
-    seatsPerTable: z.number().optional(),
-    row_count: z.number().optional(),
-    seats_per_row: z.number().optional(),
+    // Price can be NaN when the input is disabled (isFree). Coerce to 0 first.
+    price: z.preprocess(nanToZero, z.number().min(0, "Price must be positive")),
+    quantity: z.preprocess(nanToZero, z.number().min(1, "Quantity must be at least 1")),
+    seatsPerTable: z.preprocess(nanToZero, z.number().optional()),
+    row_count: z.preprocess(nanToZero, z.number().optional()),
+    seats_per_row: z.preprocess(nanToZero, z.number().optional()),
     allowCombinedNames: z.boolean().optional(),
     isFree: z.boolean().optional(),
   })
   .superRefine((data, ctx) => {
+    // Skip price validation when ticket is free
+    if (!data.isFree && data.price < 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Price must be 0 or greater",
+        path: ["price"],
+      });
+    }
+
     if (data.type === TicketType.TABLE) {
       if (!data.seatsPerTable || data.seatsPerTable < 1) {
         ctx.addIssue({
@@ -388,7 +402,7 @@ export default function StepTicketing() {
                               {meta.label}
                             </span>
                             <span className="text-white/40 text-xs font-medium">
-                              {tier.is_free ? "Free" : `₦${(tier.base_price / 100).toFixed(2)}`}
+                              {tier.is_free ? "Free" : `₦${tier.base_price.toLocaleString()}`}
                             </span>
                             <span className="text-white/30 text-xs">
                               Qty: {tier.quantity_available}

@@ -225,7 +225,7 @@ export default function StepPreview() {
                           </span>
                         </td>
                         <td className="p-3 text-white/60 font-mono">
-                          {tier.is_free ? "Free" : `₦${(tier.base_price / 100).toFixed(2)}`}
+                          {tier.is_free ? "Free" : `₦${tier.base_price.toLocaleString()}`}
                         </td>
                         <td className="p-3 text-white/60">
                           {tier.quantity_available}

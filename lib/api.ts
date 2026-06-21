@@ -9,7 +9,14 @@ import {
 import { ReservationItem, ReservationResponse } from "./schema/orderTied";
 import { toast } from "@/lib/store/toastStore";
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL || 'https://ticketweb.gogoaltv.com'}/api/v1`;
+const isServer = typeof window === "undefined";
+const BACKEND_URL = process.env.BACKEND_URL || "http://127.0.0.1:8005";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL 
+  ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1`
+  : isServer
+    ? `${BACKEND_URL}/api/v1`
+    : '/api/v1';
 
 export const api = axios.create({
   baseURL: API_URL,

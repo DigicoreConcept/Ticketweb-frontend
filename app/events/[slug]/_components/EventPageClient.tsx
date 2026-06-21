@@ -9,7 +9,7 @@ import EventBookingFlow from "./EventBookingFlow";
 import BackButton from "@/components/ui/BackButton";
 
 const COLLAPSE_AT = 80;
-const EXPAND_AT   = 8;
+const EXPAND_AT = 8;
 
 export default function EventPageClient({
   event,
@@ -23,7 +23,7 @@ export default function EventPageClient({
   useEffect(() => {
     const handleScroll = () => {
       const y = window.scrollY;
-      if (y > COLLAPSE_AT)   setIsCollapsed(true);
+      if (y > COLLAPSE_AT) setIsCollapsed(true);
       else if (y < EXPAND_AT) setIsCollapsed(false);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -32,7 +32,6 @@ export default function EventPageClient({
 
   return (
     <div className="min-h-screen pb-20 font-sans">
-
       {/* ── FIXED collapsed bar — sits above everything when scrolled ── */}
       <AnimatePresence>
         {isCollapsed && (
@@ -43,10 +42,10 @@ export default function EventPageClient({
             transition={{ type: "spring", stiffness: 320, damping: 32 }}
             className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/90 backdrop-blur-xl border-b border-white/[0.07]"
           >
-            <div className="max-w-7xl mx-auto px-6 md:px-12 h-14 flex items-center gap-3">
+            <div className="max-w-7xl mx-auto px-6 md:px-12 h-24 flex items-center gap-3">
               <BackButton />
 
-              <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 border border-white/10">
+              <div className="w-8 h-8 md:h-20 md:w-20 rounded-lg overflow-hidden shrink-0 border border-white/10">
                 <img
                   src={event.image_url || event.banner_image_url}
                   alt={event.title}
@@ -65,7 +64,10 @@ export default function EventPageClient({
 
               {event.ticket_tiers && event.ticket_tiers.length > 0 && (
                 <span className="shrink-0 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold">
-                  From ₦{Math.min(...event.ticket_tiers.map((t) => t.base_price)).toLocaleString()}
+                  From ₦
+                  {Math.min(
+                    ...event.ticket_tiers.map((t) => t.base_price),
+                  ).toLocaleString()}
                 </span>
               )}
             </div>
@@ -92,11 +94,15 @@ export default function EventPageClient({
                 exit={{ opacity: 0 }}
                 className="absolute inset-0"
               >
-                <img
-                  src={event.banner_image_url}
-                  alt={event.title}
-                  className="w-full h-full object-cover object-top opacity-60"
-                />
+                {event.banner_image_url ? (
+                  <img
+                    src={event.banner_image_url}
+                    alt={event.title}
+                    className="w-full h-full object-cover object-top opacity-60"
+                  />
+                ) : (
+                  <></>
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
               </motion.div>
             )}
@@ -132,11 +138,15 @@ export default function EventPageClient({
                 <div className="flex flex-col md:flex-row gap-3 md:gap-6 text-white/70 font-medium">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-primary" />
-                    <span className={isCollapsed ? "text-xs" : "text-lg"}>{formattedDate}</span>
+                    <span className={isCollapsed ? "text-xs" : "text-lg"}>
+                      {formattedDate}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-primary" />
-                    <span className={isCollapsed ? "text-xs" : "text-lg"}>{event.location}</span>
+                    <span className={isCollapsed ? "text-xs" : "text-lg"}>
+                      {event.location}
+                    </span>
                   </div>
                 </div>
               </motion.div>
@@ -152,7 +162,6 @@ export default function EventPageClient({
         style={{ paddingTop: isCollapsed ? "calc(3rem + 56px)" : "3rem" }}
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
-
           {/* LEFT — scrolls naturally with the page (the illusion of scrolling past) */}
           <div className="lg:col-span-7">
             <EventDetails

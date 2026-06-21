@@ -99,18 +99,30 @@ export default function TicketSelection({
   };
 
   const handleCheckout = () => {
-    const items = selectedTierIds.map(tierId => {
-      const qty = quantities[tierId] || 0;
-      return { tier_id: tierId, quantity: qty };
-    }).filter(item => item.quantity > 0);
+    // Build the final items list — only tiers that are selected AND have qty > 0
+    const items = selectedTierIds
+      .map((tierId) => ({ tier_id: tierId, quantity: quantities[tierId] || 0 }))
+      .filter((item) => item.quantity > 0);
 
-    if (items.length > 0) {
-      onCheckout(items, quantities, selectedSeats);
-    }
+    if (items.length === 0) return;
+
+    // Strip deselected tier entries out of both maps before passing upstream.
+    // Without this, a tier that was selected then deselected still has an entry
+    // in quantities/selectedSeats, causing ghost attendee slots to be generated.
+    const activeIds = new Set(items.map((i) => i.tier_id));
+
+    const cleanQuantities: Record<string, number> = {};
+    const cleanSeats: Record<string, string[]> = {};
+    activeIds.forEach((id) => {
+      cleanQuantities[id] = quantities[id] || 0;
+      if (selectedSeats[id]) cleanSeats[id] = selectedSeats[id];
+    });
+
+    onCheckout(items, cleanQuantities, cleanSeats);
   };
 
   return (
-    <div className="space-y-4">
+    <div className={`space-y-4 transition-[padding] duration-300 ${total > 0 ? "pb-14" : ""}`}>
       <div className="flex items-center gap-2 mb-2 text-white/50 text-xs px-1">
         <Info className="w-3 h-3" />
         <span>Select one or more ticket types to proceed</span>
@@ -132,7 +144,7 @@ export default function TicketSelection({
             {/* Ticket Card */}
             <div
               onClick={() => handleSelectTier(tier.id)}
-              className={`relative overflow-hidden flex justify-between items-center rounded-2xl p-5 cursor-pointer transition-all duration-300 border backdrop-blur-md ${
+              className={`relative overflow-hidden flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 rounded-2xl p-4 sm:p-5 cursor-pointer transition-all duration-300 border backdrop-blur-md ${
                 selected
                   ? "border-primary/50 bg-white/[0.08] shadow-[0_0_20px_rgba(59,130,246,0.1)]"
                   : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]"
@@ -141,23 +153,23 @@ export default function TicketSelection({
               {/* Glass Highlight */}
               <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-50" />
               
-              <div className="flex items-center gap-5">
+              <div className="flex items-start sm:items-center gap-3 sm:gap-5 w-full sm:w-auto">
                 <div
-                  className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-300 ${
+                  className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-300 ${
                     selected ? "bg-primary/20" : "bg-white/5 group-hover:bg-white/10"
                   }`}
                 >
                   <Icon
-                    className={`w-6 h-6 transition-colors duration-300 ${
+                    className={`w-5 h-5 sm:w-6 sm:h-6 transition-colors duration-300 ${
                       selected ? "text-primary" : "text-white/40 group-hover:text-white/60"
                     }`}
                   />
                 </div>
-                <div>
-                  <div className="flex items-center justify-between gap-4 w-full">
-                    <h3 className="font-bold text-base text-white tracking-tight">{tier.name}</h3>
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4 w-full">
+                    <h3 className="font-bold text-sm sm:text-base text-white tracking-tight break-words">{tier.name}</h3>
                     <span
-                        className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full border"
+                        className="w-fit text-[9px] sm:text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full border"
                         style={{
                           background: `${meta.color}15`,
                           color: meta.color,
@@ -167,8 +179,8 @@ export default function TicketSelection({
                         {meta.label}
                       </span>
                   </div>
-                  <div className="flex items-center gap-3 mt-1.5">
-                    <span className="text-lg font-bold text-white/90">
+                  <div className="flex items-center gap-3 mt-1 sm:mt-1.5">
+                    <span className="text-base sm:text-lg font-bold text-white/90">
                       ₦{tier.base_price.toLocaleString()}
                     </span>
                   </div>
@@ -176,7 +188,7 @@ export default function TicketSelection({
               </div>
 
               {/* Interaction Area */}
-              <div className="flex items-center gap-4" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center self-end sm:self-auto gap-4" onClick={(e) => e.stopPropagation()}>
                 {selected ? (
                   tier.type !== TicketType.ASSIGNED_SEATING ? (
                     <div className="flex items-center bg-black/40 rounded-lg p-1 border border-white/5">

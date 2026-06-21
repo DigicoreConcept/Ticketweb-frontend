@@ -32,7 +32,6 @@ export default function EventBookingFlow({ event }: { event: PublicEvent }) {
     const generatedSlots = buildAttendeeSlots(event, quantities, selectedSeats);
     setSlots(generatedSlots);
     setStep("CONTACT");
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleAttendeesSubmit = async (
@@ -120,7 +119,6 @@ export default function EventBookingFlow({ event }: { event: PublicEvent }) {
       const res = await holdTickets(event.id, items);
       setReservation(res);
       setStep("CHECKOUT");
-      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err: any) {
       setError("Failed to reserve tickets. They might be sold out or the session expired.");
     }
@@ -129,61 +127,62 @@ export default function EventBookingFlow({ event }: { event: PublicEvent }) {
   const handleSuccess = (completedOrder: any) => {
     setOrder(completedOrder);
     setStep("SUCCESS");
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   if (step === "SUCCESS" && order) {
     return (
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="bg-white p-8 rounded-3xl shadow-2xl border text-center space-y-8 max-w-lg mx-auto overflow-hidden relative"
-      >
-        <div className="absolute top-0 left-0 w-full h-2 bg-green-500" />
-        
-        <div className="flex justify-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center animate-bounce">
-            <CheckCircle2 className="w-12 h-12 text-green-500" />
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95, y: 10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          className="bg-neutral-950 p-8 md:p-10 rounded-3xl shadow-2xl border border-white/10 text-center space-y-8 max-w-lg w-full overflow-hidden relative"
+        >
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary/50 via-primary to-primary/50" />
+          
+          <div className="flex justify-center">
+            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(251,45,0,0.2)]">
+              <CheckCircle2 className="w-10 h-10 text-primary" />
+            </div>
           </div>
-        </div>
-        
-        <div className="space-y-2">
-          <h2 className="text-3xl font-black text-gray-900 tracking-tight">Order Confirmed!</h2>
-          <p className="text-gray-500 font-medium">
-            Your tickets have been sent to <span className="text-gray-900 font-bold">{order.customer_email || 'your email'}</span>.
-          </p>
-        </div>
-
-        <div className="bg-gray-50 p-6 rounded-2xl text-left border border-gray-100 space-y-4">
-          <div>
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">
-              Order Reference
+          
+          <div className="space-y-2">
+            <h2 className="text-3xl font-black text-white tracking-tight">Order Confirmed!</h2>
+            <p className="text-neutral-400 font-medium">
+              Your tickets have been sent to <strong className="text-white font-bold">{order.customer_email || 'your email'}</strong>.
             </p>
-            <p className="font-mono text-xl font-bold text-gray-800">{order.id || order.reference}</p>
           </div>
-          <div className="h-[1px] bg-gray-200 w-full" />
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-500">Total Paid</span>
-            <span className="font-bold text-gray-900">₦{(order.total_amount || 0).toLocaleString()}</span>
-          </div>
-        </div>
 
-        <div className="pt-4 flex flex-col gap-3">
-          <Link
-            href="/dashboard"
-            className="w-full bg-black text-white py-4 rounded-xl font-bold hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
-          >
-            <Ticket className="w-5 h-5" />
-            View My Tickets
-          </Link>
-          <Link
-            href="/"
-            className="text-gray-400 hover:text-gray-600 font-bold text-sm"
-          >
-            Return to Home
-          </Link>
-        </div>
-      </motion.div>
+          <div className="bg-white/[0.03] p-6 rounded-2xl text-left border border-white/5 space-y-4">
+            <div>
+              <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mb-1">
+                Order Reference
+              </p>
+              <p className="font-mono text-xl font-bold text-white">{order.id || order.reference}</p>
+            </div>
+            <div className="h-[1px] bg-white/5 w-full" />
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-neutral-400 font-semibold">Total Paid</span>
+              <span className="font-bold text-white text-xl">₦{(order.total_amount || 0).toLocaleString()}</span>
+            </div>
+          </div>
+
+          <div className="pt-2 flex flex-col gap-3">
+            <Link
+              href="/dashboard"
+              className="w-full bg-primary text-white py-4 rounded-xl font-bold hover:bg-orange-600 transition-all shadow-[0_0_20px_rgba(251,45,0,0.3)] hover:shadow-[0_0_30px_rgba(251,45,0,0.5)] flex items-center justify-center gap-2 active:scale-[0.98]"
+            >
+              <Ticket className="w-5 h-5" />
+              View My Tickets
+            </Link>
+            <Link
+              href="/"
+              className="text-neutral-500 hover:text-white font-bold text-sm py-2 transition-colors"
+            >
+              Return to Events
+            </Link>
+          </div>
+        </motion.div>
+      </div>
     );
   }
 

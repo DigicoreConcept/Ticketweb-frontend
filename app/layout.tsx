@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | GoGoalTv Ticketing",
-    default: "GoGoalTv Ticketing - Discover and Book Events",
+    template: "%s | TicketWeb",
+    default: "TicketWeb - Discover and Book Events",
   },
   description: "Your one-stop platform for discovering and booking events globally.",
 };

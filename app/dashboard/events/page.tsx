@@ -48,13 +48,13 @@ const EventPage = () => {
           </Link>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
           {events.map((event) => (
             <div
               key={event.id}
               className="bg-white/5 rounded-2xl border border-white/5 overflow-hidden hover:border-white/10 transition-colors group"
             >
-              <div className="h-48 bg-neutral-900 relative overflow-hidden">
+              <div className="h-72 bg-neutral-900 relative overflow-hidden">
                 {event.image_url ? (
                   <img
                     src={event.image_url}
