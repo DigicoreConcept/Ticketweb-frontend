@@ -11,12 +11,13 @@ interface User {
   is_active: boolean;
   is_verified: boolean;   // ← now exposed
   is_superuser: boolean;
+  role: "ATTENDEE" | "ORGANIZER";
 }
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (token: string) => Promise<void>;
+  login: (token: string) => Promise<User>;
   logout: () => void;
   isAuthenticated: boolean;
   refreshUser: () => Promise<void>;  // ← call after verification to update state
@@ -53,9 +54,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const response = await api.get("/auth/me");
       setUser(response.data);
-      router.push("/dashboard");
+      return response.data;
     } catch (error) {
       console.error("Failed to fetch user after login", error);
+      throw error;
     }
   };
 

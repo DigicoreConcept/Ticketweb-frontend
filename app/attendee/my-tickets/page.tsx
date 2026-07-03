@@ -5,7 +5,6 @@ import { getMyOrders } from "@/lib/api";
 import { motion } from "framer-motion";
 import { Calendar, MapPin, Ticket, AlertCircle } from "lucide-react";
 import Link from "next/link";
-import BackButton from "@/components/ui/BackButton";
 
 export default function MyTicketsPage() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -26,12 +25,10 @@ export default function MyTicketsPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] py-12 px-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <BackButton />
-          <h1 className="text-3xl font-black text-white tracking-tight">My Tickets</h1>
-        </div>
+    <div className="max-w-4xl mx-auto">
+      <div className="flex items-center gap-4 mb-8">
+        <h1 className="text-3xl font-black text-white tracking-tight">My Tickets</h1>
+      </div>
 
         {loading ? (
           <div className="space-y-4">
@@ -118,7 +115,6 @@ export default function MyTicketsPage() {
             })}
           </div>
         )}
-      </div>
-    </main>
+    </div>
   );
 }

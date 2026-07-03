@@ -4,22 +4,20 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
-  CalendarPlus,
   LogOut,
   Ticket,
   Settings,
-  Wallet,
+  List,
   X,
-  ArrowRightLeft,
+  ArrowRightLeft
 } from "lucide-react";
 import { useAuth } from "@/app/context/AuthContext";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { VerificationBanner } from "@/components/dashboard/VerificationBanner";
-import { toast } from "@/lib/store/toastStore";
 
-export default function DashboardClientLayout({
+export default function AttendeeDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -32,11 +30,8 @@ export default function DashboardClientLayout({
   useEffect(() => {
     if (!loading && !isAuthenticated) {
       router.replace(`/auth/login?_r=${encodeURIComponent(pathname)}`);
-    } else if (!loading && isAuthenticated && user?.role === "ATTENDEE") {
-      toast.error("You do not have permission to access the Organizer Dashboard");
-      router.replace("/attendee/dashboard");
     }
-  }, [loading, isAuthenticated, user, router, pathname]);
+  }, [loading, isAuthenticated, router, pathname]);
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -47,15 +42,10 @@ export default function DashboardClientLayout({
   };
 
   const navItems = [
-    { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Events", href: "/dashboard/events", icon: Ticket },
-    { name: "Wallet", href: "/dashboard/wallet", icon: Wallet },
-    {
-      name: "Create Event",
-      href: "/dashboard/events/create",
-      icon: CalendarPlus,
-    },
-    { name: "Settings", href: "/dashboard/settings", icon: Settings },
+    { name: "Overview", href: "/attendee/dashboard", icon: LayoutDashboard },
+    { name: "My Tickets", href: "/attendee/my-tickets", icon: Ticket },
+    { name: "Waitlists", href: "/attendee/waitlists", icon: List },
+    { name: "Settings", href: "/attendee/settings", icon: Settings },
   ];
 
   return (
@@ -73,22 +63,25 @@ export default function DashboardClientLayout({
 
         <nav className="flex-1 px-4 py-8 space-y-1">
           <p className="px-4 text-xs font-semibold text-neutral-600 uppercase tracking-widest mb-4">
-            Organizer Portal
+            Attendee Portal
           </p>
+          
+          {user?.role === "ORGANIZER" && (
+            <div className="mb-6 px-2">
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-sm font-bold text-white/80 w-full"
+              >
+                <ArrowRightLeft className="w-4 h-4 text-primary" />
+                Switch to Organizer
+              </Link>
+            </div>
+          )}
 
-          <div className="mb-6 px-2">
-            <Link
-              href="/attendee/dashboard"
-              className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-sm font-bold text-white/80 w-full"
-            >
-              <ArrowRightLeft className="w-4 h-4 text-primary" />
-              Switch to Attendee
-            </Link>
-          </div>
           {navItems.map((item) => {
             const isActive =
               pathname === item.href ||
-              (pathname.startsWith(item.href) && item.href !== "/dashboard");
+              (pathname.startsWith(item.href) && item.href !== "/attendee/dashboard" && item.href !== "/attendee");
             return (
               <Link
                 key={item.name}
@@ -97,7 +90,7 @@ export default function DashboardClientLayout({
               >
                 {isActive && (
                   <motion.div
-                    layoutId="activeNav"
+                    layoutId="activeNavAttendee"
                     className="absolute inset-0 bg-primary/10 rounded-xl"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -136,7 +129,6 @@ export default function DashboardClientLayout({
       <AnimatePresence>
         {mobileMenuOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -144,7 +136,6 @@ export default function DashboardClientLayout({
               onClick={() => setMobileMenuOpen(false)}
               className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm lg:hidden"
             />
-            {/* Drawer */}
             <motion.div
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
@@ -171,21 +162,25 @@ export default function DashboardClientLayout({
 
               <nav className="flex-1 px-2 space-y-1">
                 <p className="px-4 text-xs font-semibold text-neutral-600 uppercase tracking-widest mb-4">
-                  Organizer Portal
+                  Attendee Portal
                 </p>
-                <div className="mb-6 px-2">
-                  <Link
-                    href="/attendee/dashboard"
-                    className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-sm font-bold text-white/80 w-full"
-                  >
-                    <ArrowRightLeft className="w-4 h-4 text-primary" />
-                    Switch to Attendee
-                  </Link>
-                </div>
+
+                {user?.role === "ORGANIZER" && (
+                  <div className="mb-6 px-2">
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-sm font-bold text-white/80 w-full"
+                    >
+                      <ArrowRightLeft className="w-4 h-4 text-primary" />
+                      Switch to Organizer
+                    </Link>
+                  </div>
+                )}
+
                 {navItems.map((item) => {
                   const isActive =
                     pathname === item.href ||
-                    (pathname.startsWith(item.href) && item.href !== "/dashboard");
+                    (pathname.startsWith(item.href) && item.href !== "/attendee/dashboard" && item.href !== "/attendee");
                   return (
                     <Link
                       key={item.name}
@@ -230,7 +225,7 @@ export default function DashboardClientLayout({
       <div className="flex-1 flex flex-col min-w-0 bg-[#0A0A0A] relative">
         <DashboardHeader onMenuClick={() => setMobileMenuOpen(true)} />
         <VerificationBanner />
-        <main className="flex-1 overflow-y-auto p-8 relative z-10 scrollbar-hide">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 relative z-10 scrollbar-hide">
           {children}
         </main>
       </div>

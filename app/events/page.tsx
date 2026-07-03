@@ -186,7 +186,7 @@ function EventsContent() {
             {/* Actions */}
             <div className="flex items-center gap-3 shrink-0">
               <Link
-                href="/my-tickets"
+                href="/attendee/my-tickets"
                 className="hidden md:flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-sm font-bold text-white/80"
               >
                 <Ticket className="w-4 h-4" />

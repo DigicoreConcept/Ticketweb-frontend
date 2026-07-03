@@ -168,7 +168,7 @@ export default function EventBookingFlow({ event }: { event: PublicEvent }) {
 
           <div className="pt-2 flex flex-col gap-3">
             <Link
-              href="/dashboard"
+              href={`/attendee/my-tickets/${order.id || order.reference}`}
               className="w-full bg-primary text-white py-4 rounded-xl font-bold hover:bg-orange-600 transition-all shadow-[0_0_20px_rgba(251,45,0,0.3)] hover:shadow-[0_0_30px_rgba(251,45,0,0.5)] flex items-center justify-center gap-2 active:scale-[0.98]"
             >
               <Ticket className="w-5 h-5" />

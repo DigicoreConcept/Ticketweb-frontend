@@ -11,6 +11,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Ticket, Zap, Users, TrendingUp } from "lucide-react";
 
+import { toast } from "@/lib/store/toastStore";
+
 const loginSchema = z.object({
   username: z.string().email({ message: "Invalid email address" }),
   password: z
@@ -54,15 +56,24 @@ export default function LoginPage() {
       const response = await api.post("/auth/login/access-token", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      login(response.data.access_token);
+      const loggedInUser = await login(response.data.access_token);
 
       const urlParams = new URLSearchParams(window.location.search);
       const redirectPath = urlParams.get("_r");
 
       if (redirectPath && redirectPath.startsWith("/")) {
-        router.push(redirectPath);
+        if (loggedInUser.role === "ATTENDEE" && redirectPath.startsWith("/dashboard")) {
+          toast.error("You do not have permission to access the Organizer Dashboard");
+          router.push("/attendee/dashboard");
+        } else {
+          router.push(redirectPath);
+        }
       } else {
-        router.push("/dashboard");
+        if (loggedInUser.role === "ATTENDEE") {
+          router.push("/attendee/dashboard");
+        } else {
+          router.push("/dashboard");
+        }
       }
     } catch (err: any) {
       setError(err.response?.data?.detail || "Login failed");

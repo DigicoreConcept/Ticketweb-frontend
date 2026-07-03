@@ -70,13 +70,12 @@ export default function MyTicketDetailPage() {
   const isPast = eventDate < new Date();
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] py-12 px-6">
-      <div className="max-w-3xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <button 
-            onClick={() => router.back()}
-            className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors"
-          >
+    <div className="max-w-3xl mx-auto">
+      <div className="flex items-center gap-4 mb-8">
+        <button 
+          onClick={() => router.back()}
+          className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors"
+        >
             <ArrowLeft className="w-5 h-5 text-white" />
           </button>
           <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">Order #{order.id.split('-')[0]}</h1>
@@ -172,8 +171,7 @@ export default function MyTicketDetailPage() {
               ))}
             </div>
           </div>
-        </div>
       </div>
-    </main>
+    </div>
   );
 }
