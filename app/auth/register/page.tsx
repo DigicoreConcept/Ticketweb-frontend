@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import api from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Ticket, Zap, Users, TrendingUp, CheckCircle2 } from "lucide-react";
 
 const registerSchema = z
@@ -30,12 +30,23 @@ const STEPS = [
   "Start selling tickets",
 ];
 
-export default function RegisterPage() {
+function RegisterForm() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  const initialRole = searchParams.get("tab") === "organizer" ? "ORGANIZER" : "ATTENDEE";
+  const [role, setRole] = useState<"ATTENDEE" | "ORGANIZER">(initialRole);
+
+  useEffect(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "ORGANIZER" || tab === "ATTENDEE") {
+      setRole(tab);
+    }
+  }, [searchParams]);
 
   const {
     register,
@@ -54,6 +65,7 @@ export default function RegisterPage() {
         email: data.email,
         password: data.password,
         full_name: data.full_name,
+        role: role,
       });
       router.push("/auth/login");
     } catch (err: any) {
@@ -149,10 +161,36 @@ export default function RegisterPage() {
         </div>
 
         <div className="w-full max-w-md">
+          {/* Role Selector Tabs */}
+          <div className="flex p-1 bg-white/5 rounded-xl mb-8 border border-white/10">
+            <button
+              type="button"
+              onClick={() => setRole("ATTENDEE")}
+              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${
+                role === "ATTENDEE" 
+                  ? "bg-white/10 text-white shadow-sm" 
+                  : "text-neutral-500 hover:text-neutral-300"
+              }`}
+            >
+              Attendee
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole("ORGANIZER")}
+              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${
+                role === "ORGANIZER" 
+                  ? "bg-white/10 text-white shadow-sm" 
+                  : "text-neutral-500 hover:text-neutral-300"
+              }`}
+            >
+              Organizer
+            </button>
+          </div>
+
           {/* Heading */}
           <div className="mb-8">
             <h1 className="text-3xl font-black text-white tracking-tight mb-2">
-              Create your account
+              Create {role === "ORGANIZER" ? "Organizer" : "Attendee"} Account
             </h1>
             <p className="text-neutral-400 text-sm">
               Already have one?{" "}
@@ -294,5 +332,17 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+      </div>
+    }>
+      <RegisterForm />
+    </Suspense>
   );
 }

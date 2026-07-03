@@ -37,7 +37,9 @@ export default function CheckoutForm({
       setTimeLeft(remaining);
       if (remaining <= 0) {
         clearInterval(interval);
-        // Reservation expired
+        // Reservation expired, auto-release tickets
+        releaseReservation(reservation.reservation_id).catch(err => console.error("Failed to release reservation:", err));
+        setError("Reservation expired. Please select tickets again.");
       }
     }, 1000);
 

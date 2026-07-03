@@ -12,6 +12,7 @@ import {
   LayoutGrid,
   List,
   ChevronLeft,
+  Ticket,
 } from "lucide-react";
 import { Event } from "@/lib/schema/eventTied";
 import { EventCard } from "@/components/landing/EventCard";
@@ -182,13 +183,24 @@ function EventsContent() {
               </div>
             </div>
 
-            {/* Filter toggle (mobile) */}
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="lg:hidden p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-colors"
-            >
-              <Filter className="w-4 h-4" />
-            </button>
+            {/* Actions */}
+            <div className="flex items-center gap-3 shrink-0">
+              <Link
+                href="/my-tickets"
+                className="hidden md:flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-sm font-bold text-white/80"
+              >
+                <Ticket className="w-4 h-4" />
+                My Tickets
+              </Link>
+              
+              {/* Filter toggle (mobile) */}
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="lg:hidden p-2.5 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+              >
+                <Filter className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       </div>

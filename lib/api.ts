@@ -235,6 +235,12 @@ export const uploadImage = async (
   return response.data;
 };
 
+// ── Orders (Attendee) ─────────────────────────────────────────────────────
+
+export const getMyOrders = async () => (await api.get("/orders/me")).data;
+export const getMyOrderById = async (id: string) => (await api.get(`/orders/${id}`)).data;
+// Note: for download we'll handle the Blob response in the UI component
+
 // ── Wallet & Stats ────────────────────────────────────────────────────────
 
 export interface WalletStats {
