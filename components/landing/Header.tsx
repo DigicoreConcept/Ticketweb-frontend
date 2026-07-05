@@ -2,15 +2,29 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/app/context/AuthContext";
 import { Ticket, Menu, X, ChevronDown, User, LogOut, Settings, LayoutDashboard } from "lucide-react";
+import { toast } from "@/lib/store/toastStore";
 
 export function Header() {
+  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { user, logout, isAuthenticated } = useAuth();
+
+  const handleCreateEventClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!isAuthenticated) {
+      router.push("/auth/register?tab=organizer");
+    } else if (user?.role === "ATTENDEE") {
+      toast.error("You don't have permission. Please log out and register as an Organizer.");
+    } else {
+      router.push("/dashboard/events/create");
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,7 +73,8 @@ export function Header() {
             Discover Events
           </Link>
           <Link
-            href="/auth/register?tab=organizer"
+            href="/dashboard/events/create"
+            onClick={handleCreateEventClick}
             className="text-sm font-bold text-neutral-300 hover:text-white transition-colors"
           >
             Create Event
@@ -173,8 +188,11 @@ export function Header() {
                 Discover Events
               </Link>
               <Link
-                href="/auth/register?tab=organizer"
-                onClick={() => setIsMobileMenuOpen(false)}
+                href="/dashboard/events/create"
+                onClick={(e) => {
+                  handleCreateEventClick(e);
+                  setIsMobileMenuOpen(false);
+                }}
                 className="text-lg font-bold text-white"
               >
                 Create Event
