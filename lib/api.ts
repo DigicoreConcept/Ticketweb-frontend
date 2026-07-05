@@ -100,7 +100,7 @@ export interface PublicEventsParams {
 }
 
 export const getPublicEvents = async (params?: PublicEventsParams): Promise<Event[]> => {
-  const response = await api.get("/public/events", { params });
+  const response = await api.get("/public/events/", { params });
   return response.data;
 };
 
@@ -162,12 +162,12 @@ export const verifyPayment = async (reference: string) => {
 export type PublicEvent = Event;
 
 export const getMyEvents = async (): Promise<Event[]> => {
-  const response = await api.get("/events");
+  const response = await api.get("/events/");
   return response.data;
 };
 
 export const createEvent = async (event: EventCreate): Promise<Event> => {
-  const response = await api.post("/events", event);
+  const response = await api.post("/events/", event);
   return response.data;
 };
 
@@ -295,21 +295,21 @@ export const changePassword = async (payload: {
 
 // ── Admin Endpoints ────────────────────────────────────────────────────────
 
-export const getAdminOrders = async (params?: any) => (await api.get("/admin/orders", { params })).data;
+export const getAdminOrders = async (params?: any) => (await api.get("/admin/orders/", { params })).data;
 export const getAdminOrder = async (id: string) => (await api.get(`/admin/orders/${id}`)).data;
 export const refundAdminOrder = async (id: string, payload: { amount: number; reason: string }) => 
   (await api.post(`/admin/orders/${id}/refund`, payload)).data;
 
-export const getAdminPayouts = async (params?: any) => (await api.get("/admin/payouts", { params })).data;
+export const getAdminPayouts = async (params?: any) => (await api.get("/admin/payouts/", { params })).data;
 export const approveAdminPayout = async (ref: string) => (await api.post(`/admin/payouts/${ref}/approve`)).data;
 export const rejectAdminPayout = async (ref: string, reason: string) => 
   (await api.post(`/admin/payouts/${ref}/reject`, { reason })).data;
 
-export const getAdminTransactions = async (params?: any) => (await api.get("/admin/transactions", { params })).data;
+export const getAdminTransactions = async (params?: any) => (await api.get("/admin/transactions/", { params })).data;
 
-export const getAdminAuditLogs = async (params?: any) => (await api.get("/admin/audit-log", { params })).data;
+export const getAdminAuditLogs = async (params?: any) => (await api.get("/admin/audit-log/", { params })).data;
 
-export const getAdminPlatformSettings = async () => (await api.get("/admin/settings")).data;
-export const updateAdminPlatformSettings = async (payload: any) => (await api.patch("/admin/settings", payload)).data;
+export const getAdminPlatformSettings = async () => (await api.get("/admin/settings/")).data;
+export const updateAdminPlatformSettings = async (payload: any) => (await api.patch("/admin/settings/", payload)).data;
 
 export default api;
