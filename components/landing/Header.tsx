@@ -20,8 +20,16 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const dashboardPath = user?.role === "ATTENDEE" ? "/attendee/dashboard" : "/dashboard";
-  const settingsPath = user?.role === "ATTENDEE" ? "/attendee/settings" : "/dashboard/settings";
+  const dashboardPath = (user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") 
+    ? "/admin/dashboard" 
+    : user?.role === "ATTENDEE" 
+      ? "/attendee/dashboard" 
+      : "/dashboard";
+  const settingsPath = (user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") 
+    ? "/admin/settings" 
+    : user?.role === "ATTENDEE" 
+      ? "/attendee/settings" 
+      : "/dashboard/settings";
 
   return (
     <header

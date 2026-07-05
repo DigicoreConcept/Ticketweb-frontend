@@ -69,7 +69,9 @@ export default function LoginPage() {
           router.push(redirectPath);
         }
       } else {
-        if (loggedInUser.role === "ATTENDEE") {
+        if (loggedInUser.role === "SUPER_ADMIN" || loggedInUser.role === "ADMIN") {
+          router.push("/admin/dashboard");
+        } else if (loggedInUser.role === "ATTENDEE") {
           router.push("/attendee/dashboard");
         } else {
           router.push("/dashboard");

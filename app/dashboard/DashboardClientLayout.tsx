@@ -76,7 +76,7 @@ export default function DashboardClientLayout({
             Organizer Portal
           </p>
 
-          <div className="mb-6 px-2">
+          <div className="mb-6 px-2 space-y-2">
             <Link
               href="/attendee/dashboard"
               className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-sm font-bold text-white/80 w-full"
@@ -84,6 +84,15 @@ export default function DashboardClientLayout({
               <ArrowRightLeft className="w-4 h-4 text-primary" />
               Switch to Attendee
             </Link>
+            {(user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") && (
+              <Link
+                href="/admin/dashboard"
+                className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-sm font-bold text-white/80 w-full"
+              >
+                <ArrowRightLeft className="w-4 h-4 text-primary" />
+                Switch to Admin
+              </Link>
+            )}
           </div>
           {navItems.map((item) => {
             const isActive =
@@ -173,7 +182,7 @@ export default function DashboardClientLayout({
                 <p className="px-4 text-xs font-semibold text-neutral-600 uppercase tracking-widest mb-4">
                   Organizer Portal
                 </p>
-                <div className="mb-6 px-2">
+                <div className="mb-6 px-2 space-y-2">
                   <Link
                     href="/attendee/dashboard"
                     className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-sm font-bold text-white/80 w-full"
@@ -181,6 +190,15 @@ export default function DashboardClientLayout({
                     <ArrowRightLeft className="w-4 h-4 text-primary" />
                     Switch to Attendee
                   </Link>
+                  {(user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") && (
+                    <Link
+                      href="/admin/dashboard"
+                      className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-sm font-bold text-white/80 w-full"
+                    >
+                      <ArrowRightLeft className="w-4 h-4 text-primary" />
+                      Switch to Admin
+                    </Link>
+                  )}
                 </div>
                 {navItems.map((item) => {
                   const isActive =

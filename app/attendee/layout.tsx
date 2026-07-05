@@ -66,8 +66,8 @@ export default function AttendeeDashboardLayout({
             Attendee Portal
           </p>
           
-          {user?.role === "ORGANIZER" && (
-            <div className="mb-6 px-2">
+          {(user?.role === "ORGANIZER" || user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") && (
+            <div className="mb-6 px-2 space-y-2">
               <Link
                 href="/dashboard"
                 className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-sm font-bold text-white/80 w-full"
@@ -75,6 +75,15 @@ export default function AttendeeDashboardLayout({
                 <ArrowRightLeft className="w-4 h-4 text-primary" />
                 Switch to Organizer
               </Link>
+              {(user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") && (
+                <Link
+                  href="/admin/dashboard"
+                  className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-sm font-bold text-white/80 w-full"
+                >
+                  <ArrowRightLeft className="w-4 h-4 text-primary" />
+                  Switch to Admin
+                </Link>
+              )}
             </div>
           )}
 
@@ -165,8 +174,8 @@ export default function AttendeeDashboardLayout({
                   Attendee Portal
                 </p>
 
-                {user?.role === "ORGANIZER" && (
-                  <div className="mb-6 px-2">
+                {(user?.role === "ORGANIZER" || user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") && (
+                  <div className="mb-6 px-2 space-y-2">
                     <Link
                       href="/dashboard"
                       className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-sm font-bold text-white/80 w-full"
@@ -174,6 +183,15 @@ export default function AttendeeDashboardLayout({
                       <ArrowRightLeft className="w-4 h-4 text-primary" />
                       Switch to Organizer
                     </Link>
+                    {(user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") && (
+                      <Link
+                        href="/admin/dashboard"
+                        className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-sm font-bold text-white/80 w-full"
+                      >
+                        <ArrowRightLeft className="w-4 h-4 text-primary" />
+                        Switch to Admin
+                      </Link>
+                    )}
                   </div>
                 )}
 

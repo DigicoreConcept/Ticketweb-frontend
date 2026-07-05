@@ -57,6 +57,27 @@ export function AdminSidebar({ isOpen, onClose }: { isOpen?: boolean; onClose?: 
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-2 space-y-8">
+        <div>
+          <h3 className="px-3 mb-3 text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
+            PORTALS
+          </h3>
+          <div className="space-y-1">
+            <Link
+              href="/dashboard"
+              className="relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-neutral-400 hover:text-white hover:bg-white/5"
+            >
+              <LayoutDashboard className="w-4 h-4 relative z-10" />
+              <span className="relative z-10">Switch to Organizer</span>
+            </Link>
+            <Link
+              href="/attendee/dashboard"
+              className="relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors text-neutral-400 hover:text-white hover:bg-white/5"
+            >
+              <Users className="w-4 h-4 relative z-10" />
+              <span className="relative z-10">Switch to Attendee</span>
+            </Link>
+          </div>
+        </div>
         {navItems.map((section) => (
           <div key={section.label}>
             <h3 className="px-3 mb-3 text-[10px] font-semibold uppercase tracking-widest text-neutral-500">
