@@ -16,8 +16,16 @@ export default function CheckoutForm({
   onSuccess: (order: any) => void;
   onCancel: () => void;
 }) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState(() => {
+    const firstItem = reservation.items?.[0];
+    const firstAttendee = firstItem?.attendees?.[0];
+    return firstAttendee?.name || "";
+  });
+  const [email, setEmail] = useState(() => {
+    const firstItem = reservation.items?.[0];
+    const firstAttendee = firstItem?.attendees?.[0];
+    return firstAttendee?.email || "";
+  });
   const [sendToAttendees, setSendToAttendees] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

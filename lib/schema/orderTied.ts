@@ -17,5 +17,5 @@ export interface ReservationResponse {
   reservation_id: string;
   expires_at: string;
   total_amount: number;
-  items: unknown[];
+  items: ReservationItem[];
 }
