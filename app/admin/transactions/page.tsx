@@ -56,7 +56,7 @@ export default function TransactionsPage() {
         
         return (
           <span className={`font-bold ${isCredit ? "text-emerald-400" : "text-white"}`}>
-            {isCredit ? "+" : ""}₦{(Math.abs(amount) / 100).toLocaleString()}
+            {isCredit ? "+" : ""}₦{(Math.abs(amount)).toLocaleString()}
           </span>
         );
       },

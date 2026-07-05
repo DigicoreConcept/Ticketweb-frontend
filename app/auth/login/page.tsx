@@ -69,11 +69,11 @@ export default function LoginPage() {
           router.push(redirectPath);
         }
       } else {
-        if (loggedInUser.role === "SUPER_ADMIN" || loggedInUser.role === "ADMIN") {
+        if (loggedInUser.role === "SUPER_ADMIN") {
           router.push("/admin/dashboard");
         } else if (loggedInUser.role === "ATTENDEE") {
           router.push("/attendee/dashboard");
-        } else {
+        } else if (loggedInUser.role === "ORGANIZER") {
           router.push("/dashboard");
         }
       }

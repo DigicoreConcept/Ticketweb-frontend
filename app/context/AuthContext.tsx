@@ -9,9 +9,9 @@ interface User {
   email: string;
   full_name: string;
   is_active: boolean;
-  is_verified: boolean;   // ← now exposed
+  is_verified: boolean; // ← now exposed
   is_superuser: boolean;
-  role: "ATTENDEE" | "ORGANIZER";
+  role: "ATTENDEE" | "ORGANIZER" | "SUPER_ADMIN";
 }
 
 interface AuthContextType {
@@ -20,12 +20,14 @@ interface AuthContextType {
   login: (token: string) => Promise<User>;
   logout: () => void;
   isAuthenticated: boolean;
-  refreshUser: () => Promise<void>;  // ← call after verification to update state
+  refreshUser: () => Promise<void>; // ← call after verification to update state
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -73,7 +75,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, logout, isAuthenticated: !!user, refreshUser }}
+      value={{
+        user,
+        loading,
+        login,
+        logout,
+        isAuthenticated: !!user,
+        refreshUser,
+      }}
     >
       {children}
     </AuthContext.Provider>
