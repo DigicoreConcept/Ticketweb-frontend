@@ -230,7 +230,7 @@ export default function DashboardClientLayout({
       <div className="flex-1 flex flex-col min-w-0 bg-[#0A0A0A] relative">
         <DashboardHeader onMenuClick={() => setMobileMenuOpen(true)} />
         <VerificationBanner />
-        <main className="flex-1 overflow-y-auto p-8 relative z-10 scrollbar-hide">
+        <main className="flex-1 overflow-y-auto p-4 lg:p-8 relative z-10 scrollbar-hide">
           {children}
         </main>
       </div>

@@ -4,7 +4,7 @@ import React from "react";
 import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 
-export function AdminHeader() {
+export function AdminHeader({ onMenuClick }: { onMenuClick?: () => void }) {
   const pathname = usePathname();
   
   const pathSegments = pathname.split("/").filter(Boolean);
@@ -13,9 +13,9 @@ export function AdminHeader() {
     : "Dashboard";
 
   return (
-    <header className="h-[60px] border-b border-white/[0.06] bg-[#0f0f0f]/80 backdrop-blur-xl flex items-center justify-between px-8 sticky top-0 z-40">
+    <header className="h-[60px] border-b border-white/[0.06] bg-[#0f0f0f]/80 backdrop-blur-xl flex items-center justify-between px-4 lg:px-8 sticky top-0 z-40">
       <div className="flex items-center gap-4">
-        <button className="lg:hidden p-2 text-neutral-400 hover:text-white">
+        <button onClick={onMenuClick} className="lg:hidden p-2 -ml-2 text-neutral-400 hover:text-white">
           <Menu className="w-5 h-5" />
         </button>
         <h1 className="text-xl font-black tracking-tight text-white">{title}</h1>

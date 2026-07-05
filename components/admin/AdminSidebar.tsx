@@ -13,9 +13,10 @@ import {
   Receipt,
   Settings,
   ShieldAlert,
-  LogOut
+  LogOut,
+  X
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { SPRING } from "@/lib/admin/motion";
 
 const navItems = [
@@ -35,19 +36,24 @@ const navItems = [
   ]}
 ];
 
-export function AdminSidebar() {
+export function AdminSidebar({ isOpen, onClose }: { isOpen?: boolean; onClose?: () => void }) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
-  return (
-    <aside className="fixed top-0 left-0 h-full w-[260px] bg-[#0f0f0f] border-r border-white/[0.06] flex flex-col z-50 hidden lg:flex">
-      <div className="p-6">
-        <Link href="/admin/dashboard" className="flex items-center gap-3">
+  const sidebarContent = (
+    <>
+      <div className="p-6 flex justify-between items-center">
+        <Link href="/admin/dashboard" className="flex items-center gap-3" onClick={onClose}>
           <div className="w-8 h-8 rounded bg-rose-600 flex items-center justify-center">
             <ShieldAlert className="w-5 h-5 text-white" />
           </div>
           <span className="font-black tracking-tight text-white text-lg">Admin Panel</span>
         </Link>
+        {onClose && (
+          <button onClick={onClose} className="lg:hidden p-2 -mr-2 text-neutral-400 hover:text-white">
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-2 space-y-8">
@@ -63,6 +69,7 @@ export function AdminSidebar() {
                   <Link
                     key={item.href}
                     href={item.href}
+                    onClick={onClose}
                     className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                       isActive ? "text-rose-500" : "text-neutral-400 hover:text-white hover:bg-white/5"
                     }`}
@@ -98,6 +105,39 @@ export function AdminSidebar() {
           </button>
         </div>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Desktop Sidebar */}
+      <aside className="fixed top-0 left-0 h-full w-[260px] bg-[#0f0f0f] border-r border-white/[0.06] z-50 hidden lg:flex flex-col">
+        {sidebarContent}
+      </aside>
+
+      {/* Mobile Sidebar */}
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={onClose}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] lg:hidden"
+            />
+            <motion.aside
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="fixed top-0 left-0 h-full w-[280px] bg-[#0f0f0f] border-r border-white/[0.06] z-[70] flex flex-col lg:hidden"
+            >
+              {sidebarContent}
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useAdminStats } from "@/lib/admin/hooks/useAdminStats";
 import { StatCard } from "@/components/admin/StatCard";
 import { STAGGER, FADE_UP } from "@/lib/admin/motion";
+import { RevenueChart } from "@/components/admin/RevenueChart";
 import {
   Banknote,
   Users,
@@ -129,10 +130,8 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-        {/* Placeholder for Revenue Chart */}
-        <motion.div variants={FADE_UP} className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl p-6 h-[400px] flex flex-col items-center justify-center text-neutral-600 border-dashed">
-          <p>Revenue Chart Area</p>
-          <span className="text-xs mt-2">(Requires Recharts Implementation)</span>
+        <motion.div variants={FADE_UP} className="bg-[#0f0f0f] border border-white/[0.06] rounded-2xl p-6 h-[400px]">
+          <RevenueChart />
         </motion.div>
 
         {/* Pending Actions */}

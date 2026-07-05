@@ -32,13 +32,18 @@ function AdminAuthGuard({ children }: { children: React.ReactNode }) {
 }
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+
   return (
     <AdminAuthGuard>
       <div data-theme="admin" className="min-h-screen bg-[#080808] text-[#f0f0f0]">
-        <AdminSidebar />
+        <AdminSidebar 
+          isOpen={isMobileMenuOpen} 
+          onClose={() => setIsMobileMenuOpen(false)} 
+        />
         <div className="lg:ml-[260px] flex flex-col min-h-screen">
-          <AdminHeader />
-          <main className="p-8 flex-1">
+          <AdminHeader onMenuClick={() => setIsMobileMenuOpen(true)} />
+          <main className="p-4 lg:p-8 flex-1">
             {children}
           </main>
         </div>

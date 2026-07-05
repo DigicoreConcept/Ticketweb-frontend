@@ -106,43 +106,43 @@ const EventPage = () => {
                   )}
                 </div>
 
-                <div className="flex gap-3">
+                <div className="grid grid-cols-3 gap-2 mt-auto">
                   <Link
                     href={`/dashboard/events/${event.id}`}
-                    className="flex-1"
+                    className="w-full"
                   >
                     <Button
                       variant="outline"
-                      className="w-full border-white/10 hover:bg-white/5 text-neutral-300 hover:text-white"
+                      className="w-full h-9 px-2 border-white/10 hover:bg-white/5 text-neutral-300 hover:text-white text-xs"
                     >
-                      <BarChart2 className="w-4 h-4 mr-2" />
-                      Stats
+                      <BarChart2 className="w-3.5 h-3.5 sm:mr-1.5" />
+                      <span className="hidden sm:inline">Stats</span>
                     </Button>
                   </Link>
                   <Link
                     href={`/events/${event.slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1"
+                    className="w-full"
                   >
                     <Button
                       variant="outline"
-                      className="w-full border-white/10 hover:bg-white/5 text-neutral-300 hover:text-white"
+                      className="w-full h-9 px-2 border-white/10 hover:bg-white/5 text-neutral-300 hover:text-white text-xs"
                     >
-                      <Eye className="w-4 h-4 mr-2" />
-                      Preview
+                      <Eye className="w-3.5 h-3.5 sm:mr-1.5" />
+                      <span className="hidden sm:inline">View</span>
                     </Button>
                   </Link>
                   <Link
                     href={`/dashboard/events/${event.id}/edit`}
-                    className="flex-1"
+                    className="w-full"
                   >
                     <Button
                       variant="outline"
-                      className="w-full border-white/10 hover:bg-white/5 text-neutral-300 hover:text-white"
+                      className="w-full h-9 px-2 border-white/10 hover:bg-white/5 text-neutral-300 hover:text-white text-xs"
                     >
-                      <Edit className="w-4 h-4 mr-2" />
-                      Edit
+                      <Edit className="w-3.5 h-3.5 sm:mr-1.5" />
+                      <span className="hidden sm:inline">Edit</span>
                     </Button>
                   </Link>
                 </div>

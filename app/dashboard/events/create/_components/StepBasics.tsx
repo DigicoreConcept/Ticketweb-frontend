@@ -225,7 +225,7 @@ export default function StepBasics() {
 
   return (
     <div className="mx-auto">
-      <div className="p-8 relative overflow-hidden">
+      <div className="p-4 sm:p-8 relative overflow-hidden">
         {/* Subtle glow top-right */}
         <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-orange-500/10 blur-3xl pointer-events-none" />
 
@@ -350,11 +350,11 @@ export default function StepBasics() {
             </FormSection>
 
             {/* Date/Time */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div>
                 <label className={labelClass}>Start Date & Time</label>
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="relative w-full sm:w-1/2">
                     <input
                       type="date"
                       {...register("startDate")}
@@ -368,7 +368,7 @@ export default function StepBasics() {
                       }}
                     />
                   </div>
-                  <div className="flex flex-1 gap-1">
+                  <div className="flex w-full sm:w-1/2 gap-1">
                     <select
                       {...register("startHour")}
                       className={`${inputClass} appearance-none cursor-pointer px-2 text-center`}
@@ -432,8 +432,8 @@ export default function StepBasics() {
               </div>
               <div>
                 <label className={labelClass}>End Date & Time</label>
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="relative w-full sm:w-1/2">
                     <input
                       type="date"
                       {...register("endDate")}
@@ -447,7 +447,7 @@ export default function StepBasics() {
                       }}
                     />
                   </div>
-                  <div className="flex flex-1 gap-1">
+                  <div className="flex w-full sm:w-1/2 gap-1">
                     <select
                       {...register("endHour")}
                       className={`${inputClass} appearance-none cursor-pointer px-2 text-center`}

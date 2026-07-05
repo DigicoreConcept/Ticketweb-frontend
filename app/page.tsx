@@ -5,6 +5,7 @@ import "swiper/css";
 
 import { useEffect, useState } from "react";
 import { HeroSection } from "@/components/landing/HeroSection";
+import { Footer } from "@/components/landing/Footer";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { ChevronRight } from "lucide-react";
 import { EventCard } from "@/components/landing/EventCard";
@@ -217,10 +218,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer Placeholder */}
-      <footer className="py-12 border-t border-white/5 text-center text-neutral-600 text-sm">
-        <p>&copy; 2026 Ticketing Platform. All rights reserved.</p>
-      </footer>
+      <Footer />
     </main>
   );
 }

@@ -49,7 +49,7 @@ export default function StepPreview() {
 
   return (
     <div className="mx-auto">
-      <div className="p-8 relative overflow-hidden">
+      <div className="p-4 sm:p-8 relative overflow-hidden">
         <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-orange-500/10 blur-3xl pointer-events-none" />
 
         <div className="relative">
@@ -192,10 +192,10 @@ export default function StepPreview() {
               </p>
             ) : (
               <div
-                className="overflow-hidden rounded-xl"
+                className="overflow-x-auto rounded-xl"
                 style={{ border: "1px solid rgba(255,255,255,0.07)" }}
               >
-                <table className="w-full text-left text-sm">
+                <table className="w-full text-left text-sm min-w-[500px]">
                   <thead style={{ background: "rgba(255,255,255,0.04)" }}>
                     <tr>
                       {["Name", "Type", "Price", "Quantity"].map((h) => (

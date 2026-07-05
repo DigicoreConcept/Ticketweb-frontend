@@ -190,7 +190,7 @@ export default function StepTicketing() {
 
   return (
     <div className="grid gap-8">
-      <div className="p-8 relative overflow-hidden">
+      <div className="p-4 sm:p-8 relative overflow-hidden">
         <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-orange-500/10 blur-3xl pointer-events-none" />
 
         <FormSection title="Create Ticket Tier">
@@ -205,7 +205,7 @@ export default function StepTicketing() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className={isFreeTicket ? "opacity-50 pointer-events-none" : ""}>
                 <label className={labelClass}>Price</label>
                 <input
@@ -273,7 +273,7 @@ export default function StepTicketing() {
               </div>
             )}
             {selectedType === TicketType.ASSIGNED_SEATING && (
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Row Count</label>
                   <input

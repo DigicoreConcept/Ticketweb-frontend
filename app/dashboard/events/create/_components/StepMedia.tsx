@@ -279,7 +279,7 @@ export default function StepMedia() {
 
   return (
     <div className="mx-auto">
-      <div className="p-8 relative overflow-hidden">
+      <div className="p-4 sm:p-8 relative overflow-hidden">
         <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-orange-500/10 blur-3xl pointer-events-none" />
 
         <div className="relative space-y-8">
