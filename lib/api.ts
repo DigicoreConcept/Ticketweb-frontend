@@ -214,10 +214,12 @@ export const updateEvent = async (
 export const holdTickets = async (
   eventId: string,
   items: ReservationItem[],
+  userId?: string | null,
 ): Promise<ReservationResponse> => {
   const response = await api.post("/orders/hold", {
     event_id: eventId,
     items,
+    user_id: userId,
   });
   return response.data;
 };

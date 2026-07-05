@@ -34,12 +34,12 @@ export function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const dashboardPath = (user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") 
+  const dashboardPath = (user?.role === "SUPER_ADMIN") 
     ? "/admin/dashboard" 
     : user?.role === "ATTENDEE" 
       ? "/attendee/dashboard" 
       : "/dashboard";
-  const settingsPath = (user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") 
+  const settingsPath = (user?.role === "SUPER_ADMIN") 
     ? "/admin/settings" 
     : user?.role === "ATTENDEE" 
       ? "/attendee/settings" 

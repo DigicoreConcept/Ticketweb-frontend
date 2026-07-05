@@ -10,6 +10,7 @@ import { CheckCircle2, Ticket, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import AttendeeForm from "./AttendeeForm";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/app/context/AuthContext";
 
 export default function EventBookingFlow({ event }: { event: PublicEvent }) {
   const [step, setStep] = useState<
@@ -22,6 +23,7 @@ export default function EventBookingFlow({ event }: { event: PublicEvent }) {
   const [error, setError] = useState<string | null>(null);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [slots, setSlots] = useState<any[]>([]);
+  const { user, logout, isAuthenticated } = useAuth();
 
   const handleHoldTicketsStep = async (
     items: ReservationItem[],
@@ -116,7 +118,7 @@ export default function EventBookingFlow({ event }: { event: PublicEvent }) {
         }
       });
 
-      const res = await holdTickets(event.id, items);
+      const res = await holdTickets(event.id, items, user?.id);
       setReservation(res);
       setStep("CHECKOUT");
     } catch (err: any) {
