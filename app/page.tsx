@@ -168,7 +168,7 @@ export default function Home() {
 
               <div className="flex flex-wrap gap-4">
                 <a
-                  href="/auth/register"
+                  href="/auth/register?tab=organizer"
                   className="inline-flex items-center gap-2 bg-primary hover:bg-orange-600 text-white px-7 py-3 rounded-full font-bold transition-all shadow-[0_0_25px_rgba(255,77,0,0.3)] hover:shadow-[0_0_35px_rgba(255,77,0,0.5)]"
                 >
                   Get Started Free
