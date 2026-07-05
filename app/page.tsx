@@ -4,6 +4,7 @@
 import "swiper/css";
 
 import { useEffect, useState } from "react";
+import { Header } from "@/components/landing/Header";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { Footer } from "@/components/landing/Footer";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -33,6 +34,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#0A0A0A]">
+      <Header />
       <HeroSection />
 
       {/* ── Trending Section ── */}
