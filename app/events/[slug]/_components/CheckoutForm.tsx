@@ -7,6 +7,8 @@ import { Loader2, Timer, CreditCard, ShieldCheck, Mail, User, Info, ArrowLeft } 
 import { motion, AnimatePresence } from "framer-motion";
 import { redirectTo } from "./utils";
 
+import { useAuth } from "@/app/context/AuthContext";
+
 export default function CheckoutForm({
   reservation,
   onSuccess,
@@ -16,16 +18,27 @@ export default function CheckoutForm({
   onSuccess: (order: any) => void;
   onCancel: () => void;
 }) {
+  const { user } = useAuth();
+
   const [name, setName] = useState(() => {
+    if (user) return user.full_name || "";
     const firstItem = reservation.items?.[0];
     const firstAttendee = firstItem?.attendees?.[0];
     return firstAttendee?.name || "";
   });
   const [email, setEmail] = useState(() => {
+    if (user) return user.email || "";
     const firstItem = reservation.items?.[0];
     const firstAttendee = firstItem?.attendees?.[0];
     return firstAttendee?.email || "";
   });
+
+  useEffect(() => {
+    if (user) {
+      setName(user.full_name || "");
+      setEmail(user.email || "");
+    }
+  }, [user]);
   const [sendToAttendees, setSendToAttendees] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
