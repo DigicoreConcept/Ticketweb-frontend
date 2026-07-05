@@ -84,7 +84,7 @@ export default function DashboardClientLayout({
               <ArrowRightLeft className="w-4 h-4 text-primary" />
               Switch to Attendee
             </Link>
-            {(user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") && (
+            {(user?.role === "SUPER_ADMIN") && (
               <Link
                 href="/admin/dashboard"
                 className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-sm font-bold text-white/80 w-full"
@@ -190,7 +190,7 @@ export default function DashboardClientLayout({
                     <ArrowRightLeft className="w-4 h-4 text-primary" />
                     Switch to Attendee
                   </Link>
-                  {(user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") && (
+                  {(user?.role === "SUPER_ADMIN") && (
                     <Link
                       href="/admin/dashboard"
                       className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-sm font-bold text-white/80 w-full"

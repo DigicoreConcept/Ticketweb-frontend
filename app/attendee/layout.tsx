@@ -9,7 +9,7 @@ import {
   Settings,
   List,
   X,
-  ArrowRightLeft
+  ArrowRightLeft,
 } from "lucide-react";
 import { useAuth } from "@/app/context/AuthContext";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
@@ -65,8 +65,8 @@ export default function AttendeeDashboardLayout({
           <p className="px-4 text-xs font-semibold text-neutral-600 uppercase tracking-widest mb-4">
             Attendee Portal
           </p>
-          
-          {(user?.role === "ORGANIZER" || user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") && (
+
+          {(user?.role === "ORGANIZER" || user?.role === "SUPER_ADMIN") && (
             <div className="mb-6 px-2 space-y-2">
               <Link
                 href="/dashboard"
@@ -75,7 +75,7 @@ export default function AttendeeDashboardLayout({
                 <ArrowRightLeft className="w-4 h-4 text-primary" />
                 Switch to Organizer
               </Link>
-              {(user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") && (
+              {user?.role === "SUPER_ADMIN" && (
                 <Link
                   href="/admin/dashboard"
                   className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-sm font-bold text-white/80 w-full"
@@ -90,7 +90,9 @@ export default function AttendeeDashboardLayout({
           {navItems.map((item) => {
             const isActive =
               pathname === item.href ||
-              (pathname.startsWith(item.href) && item.href !== "/attendee/dashboard" && item.href !== "/attendee");
+              (pathname.startsWith(item.href) &&
+                item.href !== "/attendee/dashboard" &&
+                item.href !== "/attendee");
             return (
               <Link
                 key={item.name}
@@ -172,33 +174,35 @@ export default function AttendeeDashboardLayout({
               <nav className="flex-1 px-2 space-y-1">
                 <p className="px-4 text-xs font-semibold text-neutral-600 uppercase tracking-widest mb-4">
                   Attendee Portal
-                </p>
-
-                {(user?.role === "ORGANIZER" || user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") && (
-                  <div className="mb-6 px-2 space-y-2">
-                    <Link
-                      href="/dashboard"
-                      className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-sm font-bold text-white/80 w-full"
-                    >
-                      <ArrowRightLeft className="w-4 h-4 text-primary" />
-                      Switch to Organizer
-                    </Link>
-                    {(user?.role === "SUPER_ADMIN" || user?.role === "ADMIN") && (
+                  {(user?.role === "ORGANIZER" ||
+                    user?.role === "SUPER_ADMIN") && (
+                    <div className="mb-6 px-2 space-y-2">
                       <Link
-                        href="/admin/dashboard"
+                        href="/dashboard"
                         className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-sm font-bold text-white/80 w-full"
                       >
                         <ArrowRightLeft className="w-4 h-4 text-primary" />
-                        Switch to Admin
+                        Switch to Organizer
                       </Link>
-                    )}
-                  </div>
-                )}
+                      {user?.role === "SUPER_ADMIN" && (
+                        <Link
+                          href="/admin/dashboard"
+                          className="flex items-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-colors text-sm font-bold text-white/80 w-full"
+                        >
+                          <ArrowRightLeft className="w-4 h-4 text-primary" />
+                          Switch to Admin
+                        </Link>
+                      )}
+                    </div>
+                  )}
+                </p>
 
                 {navItems.map((item) => {
                   const isActive =
                     pathname === item.href ||
-                    (pathname.startsWith(item.href) && item.href !== "/attendee/dashboard" && item.href !== "/attendee");
+                    (pathname.startsWith(item.href) &&
+                      item.href !== "/attendee/dashboard" &&
+                      item.href !== "/attendee");
                   return (
                     <Link
                       key={item.name}
