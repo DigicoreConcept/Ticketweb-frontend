@@ -31,9 +31,9 @@ const ticketTierSchema = z
     // Price can be NaN when the input is disabled (isFree). Coerce to 0 first.
     price: z.preprocess(nanToZero, z.number().min(0, "Price must be positive")),
     quantity: z.preprocess(nanToZero, z.number().min(1, "Quantity must be at least 1")),
-    seatsPerTable: z.preprocess(nanToZero, z.number().optional()),
-    row_count: z.preprocess(nanToZero, z.number().optional()),
-    seats_per_row: z.preprocess(nanToZero, z.number().optional()),
+    seatsPerTable: z.preprocess(nanToZero, z.number().optional()).optional(),
+    row_count: z.preprocess(nanToZero, z.number().optional()).optional(),
+    seats_per_row: z.preprocess(nanToZero, z.number().optional()).optional(),
     allowCombinedNames: z.boolean().optional(),
     isFree: z.boolean().optional(),
   })
@@ -109,7 +109,7 @@ export default function StepTicketing() {
     reset,
     formState: { errors },
   } = useForm<TicketTierFormValues>({
-    resolver: zodResolver(ticketTierSchema),
+    resolver: zodResolver(ticketTierSchema) as any,
     defaultValues: {
       type: TicketType.GENERAL_ADMISSION,
       price: 0,

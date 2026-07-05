@@ -10,7 +10,7 @@ import { ReservationItem, ReservationResponse } from "./schema/orderTied";
 import { toast } from "@/lib/store/toastStore";
 
 const isServer = typeof window === "undefined";
-const BACKEND_URL = process.env.BACKEND_URL || "http://127.0.0.1:8005";
+const BACKEND_URL = process.env.BACKEND_URL || "https://ticket.gogoalive.com";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL 
   ? `${process.env.NEXT_PUBLIC_API_URL}/api/v1`

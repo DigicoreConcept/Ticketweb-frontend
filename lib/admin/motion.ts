@@ -26,6 +26,8 @@ export const SCALE_TAP = {
   whileHover: { scale: 1.01 }
 };
 
-export const SPRING = {
+import { Transition } from "framer-motion";
+
+export const SPRING: Transition = {
   type: "spring", stiffness: 300, damping: 28
 };
