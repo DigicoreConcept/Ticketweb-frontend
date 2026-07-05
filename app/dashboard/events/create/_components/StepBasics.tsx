@@ -338,6 +338,7 @@ export default function StepBasics() {
                   render={({ field, fieldState }) => (
                     <LocationPicker
                       locationData={watch("locationData")}
+                      country={watch("country")}
                       onChange={(newLoc, newLocData) => {
                         field.onChange(newLoc);
                         setValue("locationData", newLocData);

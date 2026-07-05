@@ -16,10 +16,12 @@ const PlacesAutocomplete = ({
   onPlaceSelect,
   initialValue,
   error,
+  country,
 }: {
   onPlaceSelect: (place: google.maps.places.PlaceResult | null) => void;
   initialValue?: string;
   error?: string;
+  country?: string;
 }) => {
   const [inputValue, setInputValue] = useState(initialValue || "");
   const places = useMapsLibrary("places");
@@ -29,21 +31,35 @@ const PlacesAutocomplete = ({
   useEffect(() => {
     if (!places || !inputRef.current) return;
 
-    const options = {
+    const options: google.maps.places.AutocompleteOptions = {
       fields: ["geometry", "name", "formatted_address", "place_id"],
     };
 
+    if (country) {
+      const countryCodeMap: Record<string, string> = {
+        "Nigeria": "ng",
+        "United States": "us",
+        "United Kingdom": "gb",
+      };
+      const code = countryCodeMap[country] || "ng";
+      options.componentRestrictions = { country: code };
+    }
+
     setAutocomplete(new places.Autocomplete(inputRef.current, options));
-  }, [places]);
+  }, [places, country]);
 
   useEffect(() => {
     if (!autocomplete) return;
 
-    autocomplete.addListener("place_changed", () => {
+    const listener = autocomplete.addListener("place_changed", () => {
       const place = autocomplete.getPlace();
       setInputValue(place.formatted_address || place.name || "");
       onPlaceSelect(place);
     });
+
+    return () => {
+      google.maps.event.removeListener(listener);
+    };
   }, [autocomplete, onPlaceSelect]);
 
   useEffect(() => {
@@ -58,6 +74,11 @@ const PlacesAutocomplete = ({
         ref={inputRef}
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+          }
+        }}
         className="w-full px-4 py-3 rounded-xl text-white placeholder-white/30 font-medium text-sm outline-none transition-all duration-200 bg-white/5 border border-white/10 focus:border-orange-500/70 focus:bg-white/8 focus:ring-2 focus:ring-orange-500/20"
         placeholder="Search for venue or address..."
       />
@@ -85,17 +106,19 @@ const MapHandler = ({ place, markerPos }: { place: google.maps.places.PlaceResul
   return null;
 };
 
-export default function LocationPicker({ locationData, onChange, error }: LocationPickerProps) {
+export default function LocationPicker({ locationData, onChange, error, country }: LocationPickerProps & { country?: string }) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
   
   const [selectedPlace, setSelectedPlace] = useState<google.maps.places.PlaceResult | null>(null);
   const [markerPosition, setMarkerPosition] = useState<google.maps.LatLngLiteral | null>(
     locationData ? { lat: locationData.lat, lng: locationData.lng } : null
   );
+  const [localError, setLocalError] = useState<string | null>(null);
 
   const handlePlaceSelect = (place: google.maps.places.PlaceResult | null) => {
     setSelectedPlace(place);
     if (place?.geometry?.location) {
+      setLocalError(null);
       const newPos = {
         lat: place.geometry.location.lat(),
         lng: place.geometry.location.lng(),
@@ -107,6 +130,8 @@ export default function LocationPicker({ locationData, onChange, error }: Locati
         lng: newPos.lng,
         place_id: place.place_id,
       });
+    } else {
+      setLocalError("Location not found. Please select a valid location from the suggestions.");
     }
   };
 
@@ -163,7 +188,8 @@ export default function LocationPicker({ locationData, onChange, error }: Locati
         <PlacesAutocomplete 
             onPlaceSelect={handlePlaceSelect} 
             initialValue={locationData?.formatted_address}
-            error={error} 
+            error={localError || error} 
+            country={country}
         />
         
         <div className="w-full h-[300px] rounded-xl overflow-hidden border border-white/10">
