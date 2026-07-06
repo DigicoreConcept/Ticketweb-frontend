@@ -130,12 +130,20 @@ export default function EventStatsPage() {
             <h1 className="text-3xl font-black text-white tracking-tight">{event.title}</h1>
             <p className="text-neutral-400 mt-2 text-sm">Event Performance & Guestlist</p>
           </div>
-          <Link href={`/events/${event.slug}`} target="_blank">
-            <button className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-medium transition-colors text-white">
-              <ExternalLink className="w-4 h-4" />
-              View Public Page
-            </button>
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href={`/dashboard/events/${event.id}/template`}>
+              <button className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-orange-600 rounded-lg text-sm font-medium transition-colors text-black">
+                <Ticket className="w-4 h-4" />
+                Design Ticket
+              </button>
+            </Link>
+            <Link href={`/events/${event.slug}`} target="_blank">
+              <button className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm font-medium transition-colors text-white">
+                <ExternalLink className="w-4 h-4" />
+                View Public Page
+              </button>
+            </Link>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
