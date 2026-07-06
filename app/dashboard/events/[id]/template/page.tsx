@@ -6,7 +6,7 @@ import { ArrowLeft, Upload, Loader2 } from "lucide-react";
 import Link from "next/link";
 import api from "@/lib/api";
 import { TemplateEditor } from "@/components/dashboard/TemplateEditor";
-import { toast } from "react-hot-toast";
+import { toast } from "@/lib/store/toastStore";
 
 export default function TicketTemplatePage() {
   const { id: eventId } = useParams() as { id: string };
