@@ -55,18 +55,18 @@ export default function EventDetails({ event, formattedDate, isCollapsed }: Even
       </AnimateCard>
 
       {/* Description */}
-      <div className="p-10 rounded-3xl relative overflow-hidden group">
+      <div className="p-6 lg:p-10 rounded-3xl relative overflow-hidden group">
         <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-50" />
 
         <div className="flex items-center gap-4 mb-8">
           <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
             <Info className="w-6 h-6 text-primary" />
           </div>
-          <h2 className="text-2xl font-black text-white tracking-tight">About this Event</h2>
+          <h2 className="text-lg md:text-2xl font-black text-white tracking-tight">About this Event</h2>
         </div>
 
         <div
-          className="text-white/60 text-lg leading-relaxed space-y-6 prose prose-invert max-w-none"
+          className="text-white/60 text-sm md:text-lg leading-relaxed space-y-6 prose prose-invert max-w-none"
           dangerouslySetInnerHTML={{
             __html: event.description || "No description provided.",
           }}
