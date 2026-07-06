@@ -176,7 +176,7 @@ export default function EventPageClient({
             className="lg:col-span-5 lg:sticky lg:self-start transition-[top] duration-300"
             style={{ top: isCollapsed ? "70px" : "20px" }}
           >
-            <div className="p-8 rounded-3xl relative overflow-hidden">
+            <div className="px-0 sm:px-6 py-8 rounded-3xl relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
               <div className="mb-8">
                 <h2 className="text-xl font-black text-white tracking-widest uppercase flex items-center gap-3">

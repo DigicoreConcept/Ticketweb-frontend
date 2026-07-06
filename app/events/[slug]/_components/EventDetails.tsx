@@ -45,22 +45,16 @@ export default function EventDetails({ event, formattedDate, isCollapsed }: Even
                 <Calendar className="w-4 h-4 text-primary" />
                 <span>{formattedDate}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-primary" />
-                <span>{event.location}</span>
-              </div>
             </div>
           </div>
         </div>
       </AnimateCard>
 
       {/* Description */}
-      <div className="p-6 lg:p-10 rounded-3xl relative overflow-hidden group">
-        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-50" />
-
-        <div className="flex items-center gap-4 mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
-            <Info className="w-6 h-6 text-primary" />
+      <div className="px-6 py-8 border-b-2 border-primary  rounded-3xl relative overflow-hidden group">
+        <div className="flex items-center gap-3 sm:gap-4 mb-8">
+          <div className="w-6 h-6 sm:w-10 sm:h-10 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <Info className="text-primary" />
           </div>
           <h2 className="text-lg md:text-2xl font-black text-white tracking-tight">About this Event</h2>
         </div>
@@ -74,12 +68,12 @@ export default function EventDetails({ event, formattedDate, isCollapsed }: Even
       </div>
 
       {/* Location Map Section */}
-      <div className="p-10 rounded-3xl mt-6 relative overflow-hidden group border border-white/[0.06] bg-white/[0.02]">
-        <div className="flex items-center gap-4 mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
-            <MapPin className="w-6 h-6 text-primary" />
+      <div className="px-6 py-8 border-t-2 border-b border-primary rounded-3xl mt-6 relative overflow-hidden">
+        <div className="flex items-center gap-3 sm:gap-4 mb-8">
+          <div className="w-6 h-6 sm:w-10 sm:h-10 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <MapPin className="text-primary" />
           </div>
-          <h2 className="text-2xl font-black text-white tracking-tight">Location</h2>
+          <h2 className="text-lg md:text-2xl font-black text-white tracking-tight">Location</h2>
         </div>
         
         <LocationDisplay 

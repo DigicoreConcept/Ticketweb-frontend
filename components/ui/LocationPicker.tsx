@@ -6,6 +6,7 @@ import { LocationData } from "@/lib/schema/eventTied";
 
 interface LocationPickerProps {
   locationData?: LocationData;
+  initialLocation?: string;
   onChange: (location: string, locationData: LocationData) => void;
   error?: string;
 }
@@ -106,7 +107,7 @@ const MapHandler = ({ place, markerPos }: { place: google.maps.places.PlaceResul
   return null;
 };
 
-export default function LocationPicker({ locationData, onChange, error, country }: LocationPickerProps & { country?: string }) {
+export default function LocationPicker({ locationData, initialLocation, onChange, error, country }: LocationPickerProps & { country?: string }) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
   
   const [selectedPlace, setSelectedPlace] = useState<google.maps.places.PlaceResult | null>(null);
@@ -187,7 +188,7 @@ export default function LocationPicker({ locationData, onChange, error, country 
       <div className="space-y-4">
         <PlacesAutocomplete 
             onPlaceSelect={handlePlaceSelect} 
-            initialValue={locationData?.formatted_address}
+            initialValue={initialLocation || locationData?.formatted_address}
             error={localError || error} 
             country={country}
         />

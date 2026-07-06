@@ -70,7 +70,7 @@ export default function EventBookingFlow({ event }: { event: PublicEvent }) {
                 email: first.email,
                 phone: first.phone,
                 table_number: t + 1,
-                seat_number: 1, // Default to 1 if shared
+                seat_number: 0, // Default to 0 if shared
               });
             } else {
               tableAttendeeIndices.forEach((idx, sIdx) => {

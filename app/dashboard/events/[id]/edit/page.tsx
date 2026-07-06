@@ -42,6 +42,7 @@ export default function EditEventPage() {
         reset();
 
         const data = await getEventById(eventId);
+        console.log(data)
         loadEventData(data);
       } catch (err: any) {
         console.error("Failed to fetch event:", err);
@@ -90,7 +91,7 @@ export default function EditEventPage() {
 
   return (
     <div className="min-h-screen text-white">
-      <div className="relative z-10 container mx-auto px-4 pt-4 pb-12 w-full">
+      <div className="relative z-10 container mx-auto sm:px-4 pt-4 pb-12 w-full">
         {/* Header & Back Button */}
         <div className="flex items-center gap-4 mb-8">
           <button 

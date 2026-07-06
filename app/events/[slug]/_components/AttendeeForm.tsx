@@ -174,8 +174,8 @@ export default function AttendeeForm({
                   style={{ backgroundColor: "#ec4899" }}
                 />
 
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-3">
+                <div className="bloack sm:flex justify-between items-center">
+                  <div className="flex items-center gap-3 mb-2">
                     <div className="w-10 h-10 rounded-full bg-[#ec4899]/10 flex items-center justify-center">
                       <Users className="w-5 h-5 text-[#ec4899]" />
                     </div>
@@ -190,9 +190,9 @@ export default function AttendeeForm({
                   </div>
 
                   {group.slots[0].slot.allow_combined_names && (
-                    <label className="flex items-center gap-2 cursor-pointer">
+                    <label className="flex items-center justify-end gap-2 cursor-pointer">
                       <span className="text-[11px] font-bold text-white/50 uppercase tracking-wider">
-                        Same for all seats
+                        Shared Seat Details
                       </span>
                       <div
                         onClick={() =>

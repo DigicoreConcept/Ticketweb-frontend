@@ -99,6 +99,7 @@ export default function StepBasics() {
     eventId,
   } = useEventBuilderStore();
 
+  
   const parseTime = (isoString: string) => {
     if (!isoString || !isoString.includes("T"))
       return { hour: "12", minute: "00", ampm: "AM" as "AM" | "PM", date: "" };
@@ -133,7 +134,7 @@ export default function StepBasics() {
       slug,
       description,
       country: country || "Nigeria",
-      location,
+      location: location,
       locationData,
       category,
       tags,
@@ -338,6 +339,7 @@ export default function StepBasics() {
                   render={({ field, fieldState }) => (
                     <LocationPicker
                       locationData={watch("locationData")}
+                      initialLocation={watch("location")}
                       country={watch("country")}
                       onChange={(newLoc, newLocData) => {
                         field.onChange(newLoc);

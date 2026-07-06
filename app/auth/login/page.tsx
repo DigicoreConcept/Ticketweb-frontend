@@ -179,9 +179,9 @@ export default function LoginPage() {
               <input
                 {...register("username")}
                 type="email"
-                placeholder="you@example.com"
+                placeholder="xamewec643@nriza.com"
                 autoComplete="email"
-                defaultValue={'xamewec643@nriza.com'}
+                defaultValue={''}
                 className={`w-full bg-white/5 border rounded-xl px-4 py-3 text-white text-sm placeholder-neutral-600 outline-none transition-all focus:border-primary/50 focus:bg-white/[0.07] focus:shadow-[0_0_0_3px_rgba(251,45,0,0.1)] ${
                   errors.username ? "border-red-500/50" : "border-white/10"
                 }`}
@@ -202,7 +202,7 @@ export default function LoginPage() {
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   autoComplete="current-password"
-                  defaultValue={'Password@123'}
+                  defaultValue={''}
                   className={`w-full bg-white/5 border rounded-xl px-4 py-3 pr-11 text-white text-sm placeholder-neutral-600 outline-none transition-all focus:border-primary/50 focus:bg-white/[0.07] focus:shadow-[0_0_0_3px_rgba(251,45,0,0.1)] ${
                     errors.password ? "border-red-500/50" : "border-white/10"
                   }`}

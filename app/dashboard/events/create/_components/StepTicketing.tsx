@@ -4,7 +4,7 @@ import {
   useEventBuilderStore,
   TicketTier,
 } from "@/lib/store/eventBuilderStore";
-import { Plus, Trash2, ArrowRight, ArrowLeft, Ticket, Zap } from "lucide-react";
+import { Plus, Trash2, ArrowRight, ArrowLeft, Ticket, Zap, Edit2 } from "lucide-react";
 import Modal from "@/components/ui/Modal";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,9 +16,10 @@ import {
   AssignedSeatingConfig,
 } from "@/lib/schema/eventTied";
 import FormSection from "@/components/ui/FormSection";
-import { createBulkTicketTier, deleteBulkTicketTiers } from "@/lib/api";
+import { createBulkTicketTier, deleteBulkTicketTiers, updateBulkTicketTiers } from "@/lib/api";
 import { useState } from "react";
 import { ClipLoader } from "@/components/ui/ClipLoader";
+import { toast } from "@/lib/store/toastStore";
 
 // NaN guard: disabled/hidden inputs return NaN with valueAsNumber — coerce to 0
 const nanToZero = (v: unknown) =>
@@ -100,7 +101,11 @@ export default function StepTicketing() {
     setStep,
     eventId,
     deletedTicketTierIds,
+    updateTicketTier,
   } = useEventBuilderStore();
+
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [selectedMobileIndex, setSelectedMobileIndex] = useState<number | null>(null);
 
   const {
     register,
@@ -136,7 +141,7 @@ export default function StepTicketing() {
       };
     }
 
-    addTicketTier({
+    const newTier = {
       name: data.name,
       type: data.type,
       base_price: data.price,
@@ -144,7 +149,18 @@ export default function StepTicketing() {
       is_free: data.isFree,
       config: config,
       allow_combined_names: data.allowCombinedNames,
-    });
+    };
+
+    console.log(newTier)
+    if (editingIndex !== null) {
+      updateTicketTier(editingIndex, {
+        ...ticketTiers[editingIndex],
+        ...newTier
+      });
+      setEditingIndex(null);
+    } else {
+      addTicketTier(newTier);
+    }
 
     // Reset only the name and price, keep type for convenience
     reset({
@@ -152,6 +168,27 @@ export default function StepTicketing() {
       name: "",
       price: 0,
     });
+  };
+
+  const handleEditClick = (index: number) => {
+    const tier = ticketTiers[index];
+    setEditingIndex(index);
+    
+    const config = tier.config || {};
+    
+    reset({
+      name: tier.name,
+      type: tier.type,
+      price: tier.base_price,
+      quantity: tier.quantity_available,
+      isFree: tier.is_free || false,
+      seatsPerTable: (config as TableTicketConfig)?.seats_per_table || 5,
+      row_count: (config as AssignedSeatingConfig)?.row_count || undefined,
+      seats_per_row: (config as AssignedSeatingConfig)?.seats_per_row || undefined,
+      allowCombinedNames: tier.allow_combined_names || false,
+    });
+    
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   // Logic to SEND the bulk list to the Backend
@@ -164,6 +201,7 @@ export default function StepTicketing() {
     setIsSubmitting(true);
     try {
       const newTiers = ticketTiers.filter((t) => !t.id);
+      const updatedTiers = ticketTiers.filter((t) => t.id);
 
       const promises = [];
 
@@ -174,15 +212,20 @@ export default function StepTicketing() {
       if (newTiers.length > 0) {
         promises.push(createBulkTicketTier(eventId, newTiers));
       }
+      
+      if (updatedTiers.length > 0) {
+        promises.push(updateBulkTicketTiers(eventId, updatedTiers as any));
+      }
 
       if (promises.length > 0) {
         await Promise.all(promises);
       }
 
+      toast.success("")
       setStep(3); // Move to Media phase
     } catch (error: any) {
       console.error("Bulk upload failed:", error);
-      alert(error.response?.data?.detail || "Failed to save tiers to server");
+      toast.error(error.response?.data?.detail || "Failed to save tiers to server");
     } finally {
       setIsSubmitting(false);
     }
@@ -190,7 +233,7 @@ export default function StepTicketing() {
 
   return (
     <div className="grid gap-8">
-      <div className="p-4 sm:p-8 relative overflow-hidden">
+      <div className="p-0 sm:p-8 relative overflow-hidden">
         <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-orange-500/10 blur-3xl pointer-events-none" />
 
         <FormSection title="Create Ticket Tier">
@@ -323,13 +366,34 @@ export default function StepTicketing() {
               </label>
             </div>
 
-            <button
-              disabled={isSubmitting}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed disabled:scale-100 bg-primary/20 text-primary hover:bg-primary hover:text-white"
-            >
-              Add Ticket{" "}
-              {isSubmitting ? <ClipLoader /> : <Plus className="w-4 h-4" />}
-            </button>
+            <div className="flex gap-4">
+              <button
+                disabled={isSubmitting}
+                className="flex flex-1 items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-xs sm:text-sm transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed disabled:scale-100 bg-primary/20 text-primary hover:bg-primary hover:text-white"
+              >
+                {editingIndex !== null ? "Update Ticket" : "Add Ticket"}{" "}
+                {isSubmitting ? <ClipLoader /> : (editingIndex !== null ? <Edit2 className="w-4 h-4" /> : <Plus className="w-4 h-4" />)}
+              </button>
+              {editingIndex !== null && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingIndex(null);
+                    reset({
+                      name: "",
+                      price: 0,
+                      quantity: 100,
+                      seatsPerTable: 5,
+                      allowCombinedNames: false,
+                      isFree: false,
+                    });
+                  }}
+                  className="flex items-center justify-center px-6 py-3 rounded-xl font-bold text-sm transition-all bg-white/10 text-white hover:bg-white/20"
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
           </form>
         </FormSection>
         <div className="relative">
@@ -373,15 +437,16 @@ export default function StepTicketing() {
                   return (
                     <div
                       key={index}
-                      className="flex justify-between items-center rounded-xl p-4 transition-all group"
+                      onClick={() => setSelectedMobileIndex(selectedMobileIndex === index ? null : index)}
+                      className={`block sm:flex justify-between items-center rounded-xl p-4 transition-all group cursor-pointer sm:cursor-default`}
                       style={{
-                        background: "rgba(255,255,255,0.04)",
-                        border: "1px solid rgba(255,255,255,0.07)",
+                        background: selectedMobileIndex === index ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.04)",
+                        border: selectedMobileIndex === index ? "1px solid rgba(255,255,255,0.15)" : "1px solid rgba(255,255,255,0.07)",
                       }}
                     >
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-start gap-3">
                         <div
-                          className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                          className="w-6 sm:w-10 h-6 sm:h-10 rounded-lg flex items-center justify-center shrink-0"
                           style={{ background: `${meta.color}18` }}
                         >
                           <Ticket
@@ -390,10 +455,21 @@ export default function StepTicketing() {
                           />
                         </div>
                         <div>
-                          <p className="font-bold text-sm">{tier.name}</p>
+                          <div  className="flex gap-2">
+                            <p className="font-bold text-sm">{tier.name}</p>
+                             <span
+                              className="text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full block sm:hidden"
+                              style={{
+                                background: `${meta.color}20`,
+                                color: meta.color,
+                              }}
+                            >
+                              {meta.label}
+                            </span>
+                          </div>
                           <div className="flex items-center gap-3 mt-1">
                             <span
-                              className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                              className="text-xs font-semibold px-2 py-0.5 rounded-full hidden sm:block"
                               style={{
                                 background: `${meta.color}20`,
                                 color: meta.color,
@@ -426,12 +502,20 @@ export default function StepTicketing() {
                           </div>
                         </div>
                       </div>
-                      <button
-                        onClick={() => removeTicketTier(index)}
-                        className="opacity-0 group-hover:opacity-100 p-2 rounded-lg transition-all text-red-400 hover:bg-red-400/10"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className={`flex justify-end text-end items-center transition-all ${selectedMobileIndex === index ? 'opacity-100 mt-3 sm:mt-0' : 'opacity-0 sm:group-hover:opacity-100 h-0 overflow-hidden sm:h-auto sm:overflow-visible'}`}>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleEditClick(index); }}
+                          className="p-2 rounded-lg text-blue-400 hover:bg-blue-400/10 mr-1"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); removeTicketTier(index); }}
+                          className="p-2 rounded-lg text-red-400 hover:bg-red-400/10"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   );
                 })}

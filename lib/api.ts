@@ -85,7 +85,7 @@ api.interceptors.response.use(
           toast.error(msg);
         }
       } else if (error.request) {
-        toast.error("Network error. Please check your connection.");
+        toast.error("Something went wrong.");
       }
     }
     return Promise.reject(error);
@@ -188,6 +188,16 @@ export const deleteBulkTicketTiers = async (
   await api.delete(`/events/${event_id}/tiers/bulk`, {
     data: { tier_ids },
   });
+};
+
+export const updateBulkTicketTiers = async (
+  event_id: string,
+  tiers: TicketTier[],
+): Promise<TicketTier[]> => {
+  const response = await api.put(`/events/${event_id}/tiers/bulk`, {
+    tiers: tiers,
+  });
+  return response.data;
 };
 
 export const createTicketTier = async (
