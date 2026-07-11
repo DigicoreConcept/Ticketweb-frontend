@@ -123,7 +123,7 @@ export const createReservation = async (
   eventId: string,
   items: { tier_id: string; quantity: number }[],
 ) => {
-  const response = await api.post("/orders/hold", {
+  const response = await api.post("/payments/hold", {
     event_id: eventId,
     items,
   });
@@ -131,7 +131,7 @@ export const createReservation = async (
 };
 
 export const releaseReservation = async (reserve_id: string) => {
-  const response = await api.post(`/orders/release/${reserve_id}`);
+  const response = await api.post(`/payments/release/${reserve_id}`);
   return response.data;
 };
 
@@ -144,7 +144,7 @@ export const checkoutOrder = async (
     send_to_attendees?: boolean;
   },
 ) => {
-  const response = await api.post("/orders/checkout", {
+  const response = await api.post("/payments/checkout", {
     reservation_id: reservationId,
     guest_email: data.email,
     guest_name: data.name,
@@ -155,7 +155,7 @@ export const checkoutOrder = async (
 };
 
 export const verifyPayment = async (reference: string) => {
-  const response = await api.get(`/orders/verify/${reference}`);
+  const response = await api.get(`/payments/verify/${reference}`);
   return response.data;
 };
 
@@ -226,7 +226,7 @@ export const holdTickets = async (
   items: ReservationItem[],
   userId?: string | null,
 ): Promise<ReservationResponse> => {
-  const response = await api.post("/orders/hold", {
+  const response = await api.post("/payments/hold", {
     event_id: eventId,
     items,
     user_id: userId,
