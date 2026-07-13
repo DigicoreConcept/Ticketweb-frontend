@@ -332,14 +332,14 @@ export default function StepMedia() {
 
         <div className="flex justify-between mt-12">
           <button
-            onClick={() => setStep(2)}
+            onClick={() => setStep(3)}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white/50 hover:text-white hover:bg-white/5 transition-all"
           >
             <ArrowLeft className="w-4 h-4" /> Back
           </button>
 
           <button
-            onClick={() => setStep(4)}
+            onClick={() => setStep(5)}
             className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90 hover:scale-[1.02] bg-orange-700"
           >
             Next: Preview <ArrowRight className="w-4 h-4" />

@@ -4,6 +4,7 @@ export type Attendee = {
   phone?: string;
   seat_number?: string | number;
   table_number?: number;
+  answers?: Record<string, string | boolean>;
 };
 
 export interface ReservationItem {

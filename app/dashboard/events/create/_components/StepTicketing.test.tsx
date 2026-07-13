@@ -1,7 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import StepTicketing from './StepTicketing';
-import { useEventBuilderStore, TicketType } from '@/lib/store/eventBuilderStore';
+import { useEventBuilderStore } from '@/lib/store/eventBuilderStore';
+import { TicketType } from '@/lib/schema/eventTied';
 
 // Mock the store
 jest.mock('@/lib/store/eventBuilderStore');

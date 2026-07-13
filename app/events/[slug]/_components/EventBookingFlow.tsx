@@ -71,6 +71,7 @@ export default function EventBookingFlow({ event }: { event: PublicEvent }) {
                 phone: first.phone,
                 table_number: t + 1,
                 seat_number: 0, // Default to 0 if shared
+                answers: first.answers,
               });
             } else {
               tableAttendeeIndices.forEach((idx, sIdx) => {
@@ -82,6 +83,7 @@ export default function EventBookingFlow({ event }: { event: PublicEvent }) {
                     phone: att.phone,
                     table_number: t + 1,
                     seat_number: sIdx + 1,
+                    answers: att.answers,
                   });
                 }
               });
@@ -105,6 +107,7 @@ export default function EventBookingFlow({ event }: { event: PublicEvent }) {
                 email: att.email,
                 phone: att.phone,
                 seat_number: slot.seat_number,
+                answers: att.answers,
               });
             }
           });
@@ -246,7 +249,11 @@ export default function EventBookingFlow({ event }: { event: PublicEvent }) {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
           >
-            <AttendeeForm slots={slots} onSubmit={handleAttendeesSubmit} />
+            <AttendeeForm 
+              slots={slots} 
+              customQuestions={(event as any).custom_questions} 
+              onSubmit={handleAttendeesSubmit} 
+            />
           </motion.div>
         )}
 

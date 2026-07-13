@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calendar, MapPin, Info } from "lucide-react";
 import { PublicEvent } from "@/lib/api";
+import { formatEventPrice } from "@/lib/utils";
 import EventDetails from "./EventDetails";
 import EventBookingFlow from "./EventBookingFlow";
 import BackButton from "@/components/ui/BackButton";
@@ -19,6 +20,45 @@ export default function EventPageClient({
   formattedDate: any;
 }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [selectedOccurrence, setSelectedOccurrence] = useState("");
+  const [occurrences, setOccurrences] = useState<string[]>([]);
+
+  useEffect(() => {
+    if ((event as any).is_recurring) {
+      const frequency = (event as any).recurring_frequency || "daily";
+      const start = new Date(event.start_time);
+      const end = (event as any).recurring_end_date ? new Date((event as any).recurring_end_date) : new Date(start.getTime() + 30 * 24 * 60 * 60 * 1000);
+      const list: string[] = [];
+      
+      let current = new Date(start);
+      for (let i = 0; i < 7; i++) {
+        if (current > end) break;
+        list.push(current.toLocaleString("en-US", {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true
+        }));
+        
+        if (frequency === "daily") {
+          current.setDate(current.getDate() + 1);
+        } else if (frequency === "weekly") {
+          current.setDate(current.getDate() + 7);
+        } else if (frequency === "monthly") {
+          current.setMonth(current.getMonth() + 1);
+        } else {
+          current.setDate(current.getDate() + 1);
+        }
+      }
+      setOccurrences(list);
+      if (list.length > 0) {
+        setSelectedOccurrence(list[0]);
+      }
+    }
+  }, [event]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -64,10 +104,7 @@ export default function EventPageClient({
 
               {event.ticket_tiers && event.ticket_tiers.length > 0 && (
                 <span className="shrink-0 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold">
-                  From ₦
-                  {Math.min(
-                    ...event.ticket_tiers.map((t) => t.base_price),
-                  ).toLocaleString()}
+                  {formatEventPrice(event.ticket_tiers)}
                 </span>
               )}
             </div>
@@ -186,6 +223,25 @@ export default function EventPageClient({
                   Secure Booking
                 </h2>
               </div>
+              
+              {/* Occurrence Picker */}
+              {(event as any).is_recurring && occurrences.length > 0 && (
+                <div className="mb-6 bg-white/[0.02] border border-white/10 rounded-2xl p-4">
+                  <label className="block text-[10px] font-black text-white/40 uppercase tracking-widest mb-2">Select Date & Time</label>
+                  <select 
+                    value={selectedOccurrence}
+                    onChange={(e) => setSelectedOccurrence(e.target.value)}
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-3 text-xs text-white outline-none focus:border-primary/50 appearance-none cursor-pointer"
+                  >
+                    {occurrences.map((occ, idx) => (
+                      <option key={idx} value={occ} className="text-neutral-900">
+                        {occ}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              
               <EventBookingFlow event={event} />
             </div>
 

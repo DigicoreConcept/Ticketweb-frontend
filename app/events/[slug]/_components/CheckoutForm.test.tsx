@@ -18,6 +18,7 @@ describe('CheckoutForm', () => {
     reservation_id: 'res-123',
     expires_at: new Date(Date.now() + 600000).toISOString(), // 10 mins from now
     total_amount: 5000,
+    items: [],
   };
 
   const mockOnSuccess = jest.fn();

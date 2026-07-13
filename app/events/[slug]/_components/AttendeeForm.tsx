@@ -12,12 +12,21 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+export interface CustomQuestion {
+  id: string;
+  label: string;
+  type: "text" | "select" | "checkbox";
+  options?: string[];
+  is_required: boolean;
+}
+
 type Attendee = {
   name: string;
   email: string;
   phone: string;
   seat_number?: number;
   table_number?: number;
+  answers?: Record<string, string | boolean>;
 };
 
 interface Slot {
@@ -31,9 +40,11 @@ interface Slot {
 
 export default function AttendeeForm({
   slots,
+  customQuestions,
   onSubmit,
 }: {
   slots: Slot[];
+  customQuestions?: CustomQuestion[];
   onSubmit: (
     attendees: Record<number, Attendee>,
     sharedTableStatus: Record<string, boolean>,
@@ -55,10 +66,45 @@ export default function AttendeeForm({
         phone: "",
         seat_number: slot.seat_number,
         table_number: slot.table_number,
+        answers: {},
       };
     });
     setAttendees(initial);
   }, [slots]);
+
+  const updateAnswer = (index: number, questionId: string, value: string | boolean) => {
+    setAttendees((prev) => {
+      const currentAttendee = prev[index] || { name: "", email: "", phone: "", answers: {} };
+      const currentAnswers = currentAttendee.answers || {};
+      const updatedAttendee = {
+        ...currentAttendee,
+        answers: {
+          ...currentAnswers,
+          [questionId]: value
+        }
+      };
+      
+      const updated = {
+        ...prev,
+        [index]: updatedAttendee
+      };
+
+      // Sync other table details if needed
+      const currentSlot = slots[index];
+      if (currentSlot.table_id && useSameTableDetails[currentSlot.table_id]) {
+        slots.forEach((slot, i) => {
+          if (slot.table_id === currentSlot.table_id) {
+            updated[i] = {
+              ...updated[i],
+              answers: { ...(updated[i].answers || {}), [questionId]: value }
+            };
+          }
+        });
+      }
+
+      return updated;
+    });
+  };
 
   const update = (index: number, field: keyof Attendee, value: string) => {
     setAttendees((prev) => {
@@ -134,10 +180,23 @@ export default function AttendeeForm({
   });
 
   const isFormValid = slots.every(
-    (_, i) =>
-      attendees[i]?.name?.trim() &&
-      attendees[i]?.email?.trim() &&
-      attendees[i]?.email?.includes("@"),
+    (_, i) => {
+      const att = attendees[i];
+      if (!att?.name?.trim() || !att?.email?.trim() || !att?.email?.includes("@")) {
+        return false;
+      }
+      if (customQuestions) {
+        for (const q of customQuestions) {
+          if (q.is_required) {
+            const ans = att.answers?.[q.id];
+            if (ans === undefined || ans === null || ans === "" || ans === false) {
+              return false;
+            }
+          }
+        }
+      }
+      return true;
+    }
   );
 
   return (
@@ -235,9 +294,12 @@ export default function AttendeeForm({
                               name: "",
                               email: "",
                               phone: "",
+                              answers: {},
                             }
                           }
                           onChange={update}
+                          customQuestions={customQuestions}
+                          onAnswerChange={updateAnswer}
                         />
                       </div>
                     );
@@ -262,9 +324,12 @@ export default function AttendeeForm({
                       name: "",
                       email: "",
                       phone: "",
+                      answers: {},
                     }
                   }
                   onChange={update}
+                  customQuestions={customQuestions}
+                  onAnswerChange={updateAnswer}
                 />
               </div>
             )}
@@ -295,10 +360,14 @@ function AttendeeInputs({
   index,
   values,
   onChange,
+  customQuestions,
+  onAnswerChange,
 }: {
   index: number;
   values: Attendee;
   onChange: (index: number, field: keyof Attendee, value: string) => void;
+  customQuestions?: CustomQuestion[];
+  onAnswerChange: (index: number, questionId: string, value: string | boolean) => void;
 }) {
   return (
     <div className="grid md:grid-cols-2 gap-4">
@@ -332,6 +401,61 @@ function AttendeeInputs({
           onChange={(e) => onChange(index, "phone", e.target.value)}
         />
       </div>
+
+      {customQuestions && customQuestions.length > 0 && (
+        <div className="md:col-span-2 pt-2 space-y-4">
+          <p className="text-xs font-bold text-white/40 uppercase tracking-widest pl-1">Additional Information</p>
+          {customQuestions.map((q) => {
+            const answerValue = values.answers?.[q.id] ?? "";
+            
+            return (
+              <div key={q.id} className="space-y-2">
+                <label className="block text-xs font-semibold text-white/70 pl-1">
+                  {q.label} {q.is_required && <span className="text-red-400">*</span>}
+                </label>
+                
+                {q.type === "text" && (
+                  <input
+                    value={answerValue as string}
+                    onChange={(e) => onAnswerChange(index, q.id, e.target.value)}
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white outline-none focus:border-primary/50 transition-all"
+                    placeholder="Enter answer"
+                    required={q.is_required}
+                  />
+                )}
+                
+                {q.type === "select" && (
+                  <div className="relative">
+                    <select
+                      value={answerValue as string}
+                      onChange={(e) => onAnswerChange(index, q.id, e.target.value)}
+                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white outline-none focus:border-primary/50 transition-all appearance-none cursor-pointer"
+                      required={q.is_required}
+                    >
+                      <option value="" className="text-neutral-900">Select option...</option>
+                      {q.options?.map((opt, i) => (
+                        <option key={i} value={opt} className="text-neutral-900">{opt}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                
+                {q.type === "checkbox" && (
+                  <label className="flex items-center gap-3 p-3 rounded-xl border border-white/5 bg-white/[0.01] cursor-pointer hover:bg-white/[0.03]">
+                    <input
+                      type="checkbox"
+                      checked={!!answerValue}
+                      onChange={(e) => onAnswerChange(index, q.id, e.target.checked)}
+                      className="w-4 h-4 rounded border-white/20 bg-transparent text-primary focus:ring-primary"
+                    />
+                    <span className="text-xs text-white/70">Yes, confirm</span>
+                  </label>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

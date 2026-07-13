@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { checkoutOrder, releaseReservation } from "@/lib/api";
+import { checkoutOrder, releaseReservation, api } from "@/lib/api";
 import { ReservationResponse } from "@/lib/schema/orderTied";
 import { Loader2, Timer, CreditCard, ShieldCheck, Mail, User, Info, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -43,6 +43,48 @@ export default function CheckoutForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState<number>(0);
+
+  // Promo Code States
+  const [promoCode, setPromoCode] = useState("");
+  const [validatingPromo, setValidatingPromo] = useState(false);
+  const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [discountText, setDiscountText] = useState("");
+  const [promoError, setPromoError] = useState<string | null>(null);
+
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) return;
+    setValidatingPromo(true);
+    setPromoError(null);
+    try {
+      const formattedCode = promoCode.trim().toUpperCase();
+      if (formattedCode === "WELCOME10") {
+        const disc = Math.round(reservation.total_amount * 0.1);
+        setDiscountAmount(disc);
+        setDiscountText("10% off");
+        setAppliedPromo(formattedCode);
+      } else if (formattedCode === "FLAT5000") {
+        const disc = Math.min(5000, reservation.total_amount);
+        setDiscountAmount(disc);
+        setDiscountText("₦5,000 off");
+        setAppliedPromo(formattedCode);
+      } else {
+        const res = await api.get(`/payments/promo/validate?code=${formattedCode}&reservation_id=${reservation.reservation_id}`);
+        const disc = res.data?.discount_amount || 0;
+        setDiscountAmount(disc);
+        setDiscountText(res.data?.description || "Discount Applied");
+        setAppliedPromo(formattedCode);
+      }
+    } catch (err: any) {
+      setPromoError(err.response?.data?.detail || "Invalid promo code.");
+      setDiscountAmount(0);
+      setAppliedPromo(null);
+    } finally {
+      setValidatingPromo(false);
+    }
+  };
+
+  const calculatedTotal = Math.max(0, reservation.total_amount - discountAmount);
 
   useEffect(() => {
     const calculateTimeLeft = () => {
@@ -89,7 +131,8 @@ export default function CheckoutForm({
         name,
         email,
         paymentToken: "paystack",
-        send_to_attendees: sendToAttendees === true
+        send_to_attendees: sendToAttendees === true,
+        promo_code: appliedPromo || undefined
       });
 
       if (response.status === "COMPLETED") {
@@ -134,13 +177,40 @@ export default function CheckoutForm({
           {reservation.items?.map((item: any, i: number) => (
             <div key={i} className="flex justify-between text-sm">
               <span className="text-white/60">{item.name || 'Ticket'} x {item.quantity}</span>
-              <span className="text-white font-medium">₦{(item.price * item.quantity).toLocaleString()}</span>
+              <span className="text-white font-medium">
+                {item.price === 0 ? "Free" : `₦${(item.price * item.quantity).toLocaleString()}`}
+              </span>
             </div>
           ))}
+          
+          {/* Promo code field */}
+          <div className="h-[1px] bg-white/5 my-2" />
+          <div className="flex gap-2">
+            <input 
+              type="text" 
+              placeholder="Promo Code" 
+              className="flex-1 bg-black/40 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white outline-none focus:border-primary/50 transition-all"
+              value={promoCode}
+              onChange={(e) => setPromoCode(e.target.value)}
+            />
+            <button 
+              type="button" 
+              onClick={handleApplyPromo}
+              disabled={validatingPromo || !promoCode}
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50"
+            >
+              {validatingPromo ? "..." : "Apply"}
+            </button>
+          </div>
+          {promoError && <p className="text-[10px] text-red-400 font-medium pl-1">{promoError}</p>}
+          {appliedPromo && <p className="text-[10px] text-green-400 font-medium pl-1">Applied: {appliedPromo} ({discountText})</p>}
+          
           <div className="h-[1px] bg-white/5 my-2" />
           <div className="flex justify-between items-end pt-1">
             <span className="text-xs font-bold text-white/30 uppercase tracking-tight">Total Due</span>
-            <span className="text-2xl font-black text-white">₦{reservation.total_amount.toLocaleString()}</span>
+            <span className="text-2xl font-black text-white">
+              {calculatedTotal === 0 ? "Free" : `₦${calculatedTotal.toLocaleString()}`}
+            </span>
           </div>
         </div>
       </div>

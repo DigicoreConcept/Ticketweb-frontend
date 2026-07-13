@@ -3,6 +3,7 @@
 import { useEventBuilderStore } from '@/lib/store/eventBuilderStore';
 import StepBasics from './_components/StepBasics';
 import StepTicketing from './_components/StepTicketing';
+import StepQuestions from './_components/StepQuestions';
 import StepMedia from './_components/StepMedia';
 import StepPreview from './_components/StepPreview';
 
@@ -12,8 +13,9 @@ export default function CreateEventPage() {
   const steps = [
     { number: 1, label: 'Basics' },
     { number: 2, label: 'Ticketing' },
-    { number: 3, label: 'Media' },
-    { number: 4, label: 'Preview' },
+    { number: 3, label: 'Questions' },
+    { number: 4, label: 'Media' },
+    { number: 5, label: 'Preview' },
   ];
 
   return (
@@ -67,8 +69,9 @@ export default function CreateEventPage() {
         <div>
           {step === 1 && <StepBasics />}
           {step === 2 && <StepTicketing />}
-          {step === 3 && <StepMedia />}
-          {step === 4 && <StepPreview />}
+          {step === 3 && <StepQuestions />}
+          {step === 4 && <StepMedia />}
+          {step === 5 && <StepPreview />}
         </div>
       </div>
     </div>

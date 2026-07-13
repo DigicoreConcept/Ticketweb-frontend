@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { TicketType, TicketConfig, Event, LocationData } from "../schema/eventTied";
+import { TicketType, TicketConfig, Event, LocationData, CustomQuestion } from "../schema/eventTied";
 
 export interface TicketTier {
   id?: string; // Optional for new tiers
@@ -33,10 +33,17 @@ interface EventBuilderState {
   eventImageUrl: string;
   eventId?: string;
   isEditMode: boolean;
+  isVirtual: boolean;
+  meetingLink: string;
+  isRecurring: boolean;
+  recurringFrequency: string;
+  recurringEndDate: string;
+  customQuestions: CustomQuestion[];
 
   // Actions
   setStep: (step: number) => void;
   updateBasics: (data: Partial<EventBuilderState>) => void;
+  updateCustomQuestions: (questions: CustomQuestion[]) => void;
   addTicketTier: (tier: TicketTier) => void;
   updateTicketTier: (index: number, tier: TicketTier) => void;
   removeTicketTier: (index: number) => void;
@@ -65,9 +72,16 @@ export const useEventBuilderStore = create<EventBuilderState>((set) => ({
   eventImageUrl: "",
   eventId: "",
   isEditMode: false,
+  isVirtual: false,
+  meetingLink: "",
+  isRecurring: false,
+  recurringFrequency: "",
+  recurringEndDate: "",
+  customQuestions: [],
 
   setStep: (step) => set({ step }),
   updateBasics: (data) => set((state) => ({ ...state, ...data })),
+  updateCustomQuestions: (questions) => set({ customQuestions: questions }),
   addTicketTier: (tier) =>
     set((state) => ({ ticketTiers: [...state.ticketTiers, tier] })),
   updateTicketTier: (index, tier) =>
@@ -108,6 +122,12 @@ export const useEventBuilderStore = create<EventBuilderState>((set) => ({
       eventImageUrl: event.image_url || "",
       eventId: event.id,
       isEditMode: true,
+      isVirtual: event.is_virtual || false,
+      meetingLink: event.meeting_link || "",
+      isRecurring: (event as any).is_recurring || false,
+      recurringFrequency: (event as any).recurring_frequency || "",
+      recurringEndDate: (event as any).recurring_end_date || "",
+      customQuestions: (event as any).custom_questions || [],
       ticketTiers: event.ticket_tiers
         ? event.ticket_tiers.map((t) => ({
             id: t.id,
@@ -140,5 +160,11 @@ export const useEventBuilderStore = create<EventBuilderState>((set) => ({
       bannerImageUrl: "",
       eventImageUrl: "",
       isEditMode: false,
+      isVirtual: false,
+      meetingLink: "",
+      isRecurring: false,
+      recurringFrequency: "",
+      recurringEndDate: "",
+      customQuestions: [],
     }),
 }));

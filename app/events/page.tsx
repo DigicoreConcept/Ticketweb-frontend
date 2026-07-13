@@ -21,6 +21,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import BackButton from "@/components/ui/BackButton";
 import { Suspense } from "react";
+import { formatEventPrice } from "@/lib/utils";
 
 const CATEGORIES = [
   "All",
@@ -81,10 +82,7 @@ function FeaturedEventCard({ event }: { event: Event }) {
           </div>
           {event.ticket_tiers && event.ticket_tiers.length > 0 && (
             <p className="text-xs font-bold text-primary/80 mt-1">
-              From ₦
-              {Math.min(
-                ...event.ticket_tiers.map((t) => t.base_price),
-              ).toLocaleString()}
+              {formatEventPrice(event.ticket_tiers)}
             </p>
           )}
         </div>
@@ -425,13 +423,7 @@ function EventsContent() {
                         event.banner_image_url ||
                         "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=800&q=80"
                       }
-                      price={
-                        event.ticket_tiers && event.ticket_tiers.length > 0
-                          ? `From ₦${Math.min(
-                              ...event.ticket_tiers.map((t) => t.base_price),
-                            ).toLocaleString()}`
-                          : "Free"
-                      }
+                      price={formatEventPrice(event.ticket_tiers)}
                       location={event.location || "TBA"}
                       category="Music"
                       isTrending={false}

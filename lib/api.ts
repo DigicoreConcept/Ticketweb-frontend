@@ -142,6 +142,7 @@ export const checkoutOrder = async (
     email: string;
     paymentToken?: string;
     send_to_attendees?: boolean;
+    promo_code?: string;
   },
 ) => {
   const response = await api.post("/payments/checkout", {
@@ -150,6 +151,7 @@ export const checkoutOrder = async (
     guest_name: data.name,
     payment_token: data.paymentToken,
     send_to_attendees: data.send_to_attendees ?? false,
+    promo_code: data.promo_code
   });
   return response.data;
 };

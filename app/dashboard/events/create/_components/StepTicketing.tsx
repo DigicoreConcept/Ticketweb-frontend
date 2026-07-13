@@ -16,7 +16,7 @@ import {
   AssignedSeatingConfig,
 } from "@/lib/schema/eventTied";
 import FormSection from "@/components/ui/FormSection";
-import { createBulkTicketTier, deleteBulkTicketTiers, updateBulkTicketTiers } from "@/lib/api";
+import { createBulkTicketTier, deleteBulkTicketTiers, updateBulkTicketTiers, getEventById } from "@/lib/api";
 import { useState } from "react";
 import { ClipLoader } from "@/components/ui/ClipLoader";
 import { toast } from "@/lib/store/toastStore";
@@ -221,7 +221,14 @@ export default function StepTicketing() {
         await Promise.all(promises);
       }
 
-      toast.success("")
+      // Fetch the latest tiers from the server to save the generated tier IDs in state
+      const eventData = await getEventById(eventId);
+      useEventBuilderStore.setState({
+        ticketTiers: eventData.ticket_tiers || [],
+        deletedTicketTierIds: []
+      });
+
+      toast.success("Ticket tiers saved successfully!");
       setStep(3); // Move to Media phase
     } catch (error: any) {
       console.error("Bulk upload failed:", error);
@@ -536,7 +543,7 @@ export default function StepTicketing() {
             disabled={ticketTiers.length === 0 || isSubmitting}
             className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] bg-orange-700 disabled:opacity-30 disabled:cursor-not-allowed disabled:scale-100"
           >
-            {eventId ? "Save & Next: Media" : "Next: Media"}{" "}
+            {eventId ? "Save & Next: Questions" : "Next: Questions"}{" "}
             {isSubmitting ? <ClipLoader /> : <ArrowRight className="w-4 h-4" />}
           </button>
         </div>

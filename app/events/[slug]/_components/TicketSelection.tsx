@@ -67,6 +67,7 @@ export default function TicketSelection({
   };
 
   const total = calculateTotal();
+  const hasSelectedTickets = selectedTierIds.some(id => (quantities[id] || 0) > 0);
 
   const handleSelectTier = (tierId: string) => {
     setSelectedTierIds((prev) => {
@@ -181,7 +182,7 @@ export default function TicketSelection({
                   </div>
                   <div className="flex items-center gap-3 mt-1 sm:mt-1.5">
                     <span className="text-base sm:text-lg font-bold text-white/90">
-                      ₦{tier.base_price.toLocaleString()}
+                      {tier.base_price === 0 || tier.is_free ? "Free" : `₦${tier.base_price.toLocaleString()}`}
                     </span>
                   </div>
                 </div>
@@ -340,7 +341,7 @@ export default function TicketSelection({
 
       {/* Floating Summary & Checkout */}
       <AnimatePresence>
-        {total > 0 && (
+        {hasSelectedTickets && (
           <motion.div
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -351,7 +352,7 @@ export default function TicketSelection({
               <div className="flex justify-between items-center mb-4">
                 <div>
                   <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-1">Estimated Total</p>
-                  <p className="text-2xl font-black text-white">₦{total.toLocaleString()}</p>
+                  <p className="text-2xl font-black text-white">{total > 0 ? `₦${total.toLocaleString()}` : "Free"}</p>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                   <TicketIcon className="w-5 h-5 text-primary" />

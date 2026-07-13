@@ -40,6 +40,14 @@ export interface LocationData {
   place_id?: string;
 }
 
+export interface CustomQuestion {
+  id: string;
+  label: string;
+  type: "text" | "select" | "checkbox";
+  options?: string[];
+  is_required: boolean;
+}
+
 export interface EventBase {
   title: string;
   slug: string;
@@ -53,6 +61,12 @@ export interface EventBase {
   category?: string;
   tags?: string;
   location_data?: LocationData;
+  is_virtual?: boolean;
+  meeting_link?: string;
+  is_recurring?: boolean;
+  recurring_frequency?: string;
+  recurring_end_date?: string;
+  custom_questions?: CustomQuestion[];
 }
 
 export interface TicketTier extends TicketTierBase {

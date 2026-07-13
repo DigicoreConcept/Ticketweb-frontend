@@ -13,6 +13,7 @@ import { EventCard } from "@/components/landing/EventCard";
 import { ArrowRight } from "lucide-react";
 import { getPublicEvents } from "@/lib/api";
 import { Event } from "@/lib/schema/eventTied";
+import { formatEventPrice } from "@/lib/utils";
 
 export default function Home() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -98,15 +99,7 @@ export default function Home() {
                       event.banner_image_url ||
                       "https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=800&q=80"
                     }
-                    price={
-                      event.ticket_tiers && event.ticket_tiers.length > 0
-                        ? event.ticket_tiers.some((t) => t.is_free)
-                          ? "Free"
-                          : `From ₦${Math.min(
-                              ...event.ticket_tiers.map((t) => t.base_price),
-                            ).toLocaleString()}`
-                        : "Free"
-                    }
+                    price={formatEventPrice(event.ticket_tiers)}
                     location={event.location || "TBA"}
                     category={event.category || "General"}
                     isTrending

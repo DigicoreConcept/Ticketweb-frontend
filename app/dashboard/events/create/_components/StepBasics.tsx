@@ -21,9 +21,11 @@ const basicsSchema = z
       .min(3, "Slug must be at least 3 characters")
       .regex(/^[a-z0-9-]+$/, "Slug must be lowercase alphanumeric with dashes"),
     description: z.string().optional(),
-    country: z.string().min(3, "Country is required"),
-    location: z.string().min(3, "Location is required"),
+    is_virtual: z.boolean().default(false),
+    country: z.string().optional(),
+    location: z.string().optional(),
     locationData: z.any().optional(),
+    meeting_link: z.string().url("Must be a valid meeting URL").optional().or(z.literal("")),
     category: z.string().optional(),
     tags: z.string().optional(),
     startDate: z.string().min(1, "Start date is required"),
@@ -34,6 +36,9 @@ const basicsSchema = z
     endHour: z.string().min(1, "Hour is required"),
     endMinute: z.string().min(1, "Minute is required"),
     endAmPm: z.enum(["AM", "PM"]),
+    is_recurring: z.boolean().default(false),
+    recurringFrequency: z.string().optional(),
+    recurringEndDate: z.string().optional(),
   })
   .refine(
     (data) => {
@@ -59,6 +64,18 @@ const basicsSchema = z
       message: "End time must be after start time",
       path: ["endHour"],
     },
+  )
+  .refine(
+    (data) => {
+      if (!data.is_virtual) {
+        return !!data.country && !!data.location && data.location.trim().length >= 3;
+      }
+      return true;
+    },
+    {
+      message: "Location details are required for physical events",
+      path: ["location"],
+    }
   );
 
 type BasicsFormValues = z.infer<typeof basicsSchema>;
@@ -97,6 +114,11 @@ export default function StepBasics() {
     setStep,
     setEventId,
     eventId,
+    isVirtual,
+    meetingLink,
+    isRecurring,
+    recurringFrequency,
+    recurringEndDate,
   } = useEventBuilderStore();
 
   
@@ -127,7 +149,7 @@ export default function StepBasics() {
     watch,
     setValue,
     control,
-  } = useForm<BasicsFormValues>({
+  } = useForm<any>({
     resolver: zodResolver(basicsSchema),
     defaultValues: {
       title,
@@ -146,10 +168,17 @@ export default function StepBasics() {
       endHour: defaultEnd.hour,
       endMinute: defaultEnd.minute,
       endAmPm: defaultEnd.ampm,
+      is_virtual: isVirtual,
+      meeting_link: meetingLink,
+      is_recurring: isRecurring,
+      recurringFrequency,
+      recurringEndDate: recurringEndDate ? recurringEndDate.split("T")[0] : "",
     },
   });
 
   const watchedTitle = watch("title");
+  const isVirtualEvent = watch("is_virtual");
+  const isRecurringEvent = watch("is_recurring");
   useEffect(() => {
     if (!slug && watchedTitle) {
       const generatedSlug = watchedTitle
@@ -173,15 +202,20 @@ export default function StepBasics() {
       title: data.title,
       slug: data.slug,
       description: data.description || "",
-      country: data.country,
-      location: data.location,
-      location_data: data.locationData || locationData,
+      country: data.is_virtual ? "Virtual" : (data.country || "Nigeria"),
+      location: data.is_virtual ? "Virtual Event" : (data.location || ""),
+      location_data: data.is_virtual ? undefined : (data.locationData || locationData),
       category: data.category || "",
       tags: data.tags || "",
       start_time: `${data.startDate}T${startH.toString().padStart(2, "0")}:${data.startMinute}:00`,
       end_time: `${data.endDate}T${endH.toString().padStart(2, "0")}:${data.endMinute}:00`,
       banner_image_url: "",
-      image_url: ""
+      image_url: "",
+      is_virtual: data.is_virtual,
+      meeting_link: data.is_virtual ? data.meeting_link : "",
+      is_recurring: data.is_recurring,
+      recurring_frequency: data.recurringFrequency,
+      recurring_end_date: data.recurringEndDate,
     };
   };
 
@@ -209,6 +243,11 @@ export default function StepBasics() {
         tags: payload.tags,
         startTime: payload.start_time,
         endTime: payload.end_time,
+        isVirtual: payload.is_virtual,
+        meetingLink: payload.meeting_link,
+        isRecurring: payload.is_recurring,
+        recurringFrequency: payload.recurring_frequency,
+        recurringEndDate: payload.recurring_end_date,
       });
 
       // 3️⃣ save draft id
@@ -243,7 +282,7 @@ export default function StepBasics() {
                 />
                 {errors.title && (
                   <p className="text-orange-400 text-xs mt-1.5 font-medium">
-                    {errors.title.message}
+                    {(errors.title as any)?.message}
                   </p>
                 )}
               </div>
@@ -278,7 +317,7 @@ export default function StepBasics() {
                 </div>
                 {errors.slug && (
                   <p className="text-orange-400 text-xs mt-1.5 font-medium">
-                    {errors.slug.message}
+                    {(errors.slug as any)?.message}
                   </p>
                 )}
               </div>
@@ -313,44 +352,79 @@ export default function StepBasics() {
               </div>
             </FormSection>
 
-            <FormSection title="Event Location">
-              {/* Country */}
+            {/* Virtual Toggle */}
+            <div className="flex items-center justify-between p-4 rounded-xl border border-white/10 bg-white/[0.02] mb-4">
               <div>
-                <label className={labelClass}>Country</label>
-                <select
-                  {...register("country")}
-                  className={`${inputClass} appearance-none cursor-pointer`}
-                >
-                  <option value="Nigeria">Nigeria</option>
-                </select>
-                {errors.country && (
+                <p className="text-sm font-bold text-white">Virtual Event</p>
+                <p className="text-xs text-white/40">Toggle if this event takes place online via video conference</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  {...register("is_virtual")}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+              </label>
+            </div>
+
+            {/* Conditionally Render Meeting Link */}
+            {isVirtualEvent && (
+              <div className="mb-4">
+                <label className={labelClass}>Meeting Link / Webinar URL</label>
+                <input
+                  {...register("meeting_link")}
+                  className={inputClass}
+                  placeholder="https://zoom.us/j/123456789"
+                />
+                {errors.meeting_link && (
                   <p className="text-orange-400 text-xs mt-1.5 font-medium">
-                    {errors.country.message}
+                    {(errors.meeting_link as any)?.message}
                   </p>
                 )}
               </div>
+            )}
 
-              {/* Location */}
-              <div>
-                <label className={labelClass}>Venue & Location</label>
-                <Controller
-                  name="location"
-                  control={control}
-                  render={({ field, fieldState }) => (
-                    <LocationPicker
-                      locationData={watch("locationData")}
-                      initialLocation={watch("location")}
-                      country={watch("country")}
-                      onChange={(newLoc, newLocData) => {
-                        field.onChange(newLoc);
-                        setValue("locationData", newLocData);
-                      }}
-                      error={fieldState.error?.message}
-                    />
+            {!isVirtualEvent && (
+              <FormSection title="Event Location">
+                {/* Country */}
+                <div>
+                  <label className={labelClass}>Country</label>
+                  <select
+                    {...register("country")}
+                    className={`${inputClass} appearance-none cursor-pointer`}
+                  >
+                    <option value="Nigeria">Nigeria</option>
+                  </select>
+                  {errors.country && (
+                    <p className="text-orange-400 text-xs mt-1.5 font-medium">
+                      {(errors.country as any)?.message}
+                    </p>
                   )}
-                />
-              </div>
-            </FormSection>
+                </div>
+
+                {/* Location */}
+                <div>
+                  <label className={labelClass}>Venue & Location</label>
+                  <Controller
+                    name="location"
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <LocationPicker
+                        locationData={watch("locationData")}
+                        initialLocation={watch("location")}
+                        country={watch("country")}
+                        onChange={(newLoc, newLocData) => {
+                          field.onChange(newLoc);
+                          setValue("locationData", newLocData);
+                        }}
+                        error={fieldState.error?.message}
+                      />
+                    )}
+                  />
+                </div>
+              </FormSection>
+            )}
 
             {/* Date/Time */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -424,7 +498,7 @@ export default function StepBasics() {
                 </div>
                 {errors.startDate && (
                   <p className="text-orange-400 text-xs mt-1.5 font-medium">
-                    {errors.startDate.message}
+                    {(errors.startDate as any)?.message}
                   </p>
                 )}
                 {(errors.startHour || errors.startMinute) && (
@@ -499,7 +573,7 @@ export default function StepBasics() {
                 </div>
                 {errors.endDate && (
                   <p className="text-orange-400 text-xs mt-1.5 font-medium">
-                    {errors.endDate.message}
+                    {(errors.endDate as any)?.message}
                   </p>
                 )}
                 {(errors.endHour || errors.endMinute) && (
@@ -509,6 +583,49 @@ export default function StepBasics() {
                 )}
               </div>
             </div>
+
+            {/* Recurring Event Toggle */}
+            <div className="flex items-center justify-between p-4 rounded-xl border border-white/10 bg-white/[0.02] mt-4">
+              <div>
+                <p className="text-sm font-bold text-white">Recurring Event</p>
+                <p className="text-xs text-white/40">Toggle if this event recurs daily, weekly, or monthly</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  {...register("is_recurring")}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+              </label>
+            </div>
+
+            {/* Recurring Schedule Fields */}
+            {isRecurringEvent && (
+              <FormSection title="Recurrence Rules (Phase 3)">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className={labelClass}>Frequency</label>
+                    <select
+                      {...register("recurringFrequency")}
+                      className={`${inputClass} appearance-none cursor-pointer`}
+                    >
+                      <option value="daily" className="text-amber-950">Daily</option>
+                      <option value="weekly" className="text-amber-950">Weekly</option>
+                      <option value="monthly" className="text-amber-950">Monthly</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className={labelClass}>Recurrence End Date</label>
+                    <input
+                      type="date"
+                      {...register("recurringEndDate")}
+                      className={inputClass}
+                    />
+                  </div>
+                </div>
+              </FormSection>
+            )}
 
             {/* Submit */}
             <div className="flex justify-end pt-2">

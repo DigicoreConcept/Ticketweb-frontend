@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import TicketSelection from './TicketSelection';
+import { TicketType } from '@/lib/schema/eventTied';
 import { PublicEvent } from '@/lib/api';
 
 const mockEvent: PublicEvent = {
@@ -10,9 +11,13 @@ const mockEvent: PublicEvent = {
   location: 'Test Loc',
   start_time: '2023-01-01',
   end_time: '2023-01-01',
+  status: 'PUBLISHED' as any,
+  country: 'Nigeria',
+  banner_image_url: "",
+  image_url: "",
   ticket_tiers: [
-    { id: 't1', name: 'VIP Section', type: 'VIP', base_price: 10000, quantity_available: 10 },
-    { id: 't2', name: 'General Admission', type: 'GENERAL_ADMISSION', base_price: 5000, quantity_available: 100 }
+    { id: 't1', name: 'VIP Section', type: 'VIP' as TicketType, base_price: 10000, quantity_available: 10 },
+    { id: 't2', name: 'General Admission', type: 'GENERAL_ADMISSION' as TicketType, base_price: 5000, quantity_available: 100 }
   ]
 };
 

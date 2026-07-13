@@ -11,6 +11,7 @@ import Link from "next/link";
 // Import the step components
 import StepBasics from "../../create/_components/StepBasics";
 import StepTicketing from "../../create/_components/StepTicketing";
+import StepQuestions from "../../create/_components/StepQuestions";
 import StepMedia from "../../create/_components/StepMedia";
 import StepPreview from "../../create/_components/StepPreview";
 
@@ -63,8 +64,9 @@ export default function EditEventPage() {
   const steps = [
     { number: 1, label: "Basics" },
     { number: 2, label: "Ticketing" },
-    { number: 3, label: "Media" },
-    { number: 4, label: "Preview" },
+    { number: 3, label: "Questions" },
+    { number: 4, label: "Media" },
+    { number: 5, label: "Preview" },
   ];
 
   if (loading || authLoading) {
@@ -175,8 +177,9 @@ export default function EditEventPage() {
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           {step === 1 && <StepBasics />}
           {step === 2 && <StepTicketing />}
-          {step === 3 && <StepMedia />}
-          {step === 4 && <StepPreview />}
+          {step === 3 && <StepQuestions />}
+          {step === 4 && <StepMedia />}
+          {step === 5 && <StepPreview />}
         </div>
       </div>
     </div>

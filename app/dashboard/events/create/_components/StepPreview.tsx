@@ -254,7 +254,7 @@ export default function StepPreview() {
           {/* Actions */}
           <div className="flex justify-between pt-2">
             <button
-              onClick={() => store.setStep(3)}
+              onClick={() => store.setStep(4)}
               disabled={isPublishing}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white/50 hover:text-white hover:bg-white/5 transition-all disabled:opacity-30"
             >
